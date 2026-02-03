@@ -49,34 +49,8 @@ if (isset($_SESSION['crm_unlocked']) && $_SESSION['crm_unlocked'] === true) {
 $is_unlocked = isset($_SESSION['crm_unlocked']) && $_SESSION['crm_unlocked'] === true;
 
 // --- Archive Function (Protected) ---
-if (isset($_GET['archive']) && $is_unlocked) {
-  $id = intval($_GET['archive']);
-  $res = $conn->query("SELECT * FROM accounts WHERE id = $id");
-
-  if ($res && $res->num_rows > 0) {
-    $row = $res->fetch_assoc();
-
-    // Move record to archive_crm
-    $stmt = $conn->prepare("INSERT INTO archive_crm (username, email, phone_number, gender, role, archived_at)
-                                VALUES (?, ?, ?, ?, ?, NOW())");
-    $stmt->bind_param(
-      "sssss",
-      $row['username'],
-      $row['email'],
-      $row['phone_number'],
-      $row['gender'],
-      $row['role']
-    );
-    $stmt->execute();
-
-    // Delete from main table
-    $conn->query("DELETE FROM accounts WHERE id = $id");
-
-    $_SESSION['alert'] = ['title' => 'Archived!', 'text' => 'Customer archived successfully.', 'icon' => 'success'];
-    header("Location: CRM.php");
-    exit;
-  }
-}
+// --- Archive Function MOVED TO Archive_CRM.php ---
+// (Logic removed)
 
 // Helper
 function h($s)
@@ -282,38 +256,12 @@ if ($is_unlocked) {
       border-left: 4px solid #fff;
     }
 
-    /* Dropdown */
-    .dropdown-container .dropdown-toggle {
-      cursor: pointer;
+    /* Better Sidebar Slide Animation for Bootstrap Collapse */
+    .collapse {
+      transition: all 0.3s ease;
     }
-
-    .dropdown-content {
-      display: none;
-      flex-direction: column;
-      margin-left: 15px;
-      border-left: 2px solid #444;
-      margin-top: 5px;
-      padding-left: 10px;
-    }
-
-    .dropdown-content a {
-      font-size: 0.9rem;
-      padding: 8px 10px;
-      color: #aaa;
-    }
-
-    .dropdown-content a:hover {
-      color: #fff;
-    }
-
-    .dropdown-content.show {
-      display: flex;
-      animation: slideDown 0.3s ease;
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
+    .collapsing {
+      transition: height 0.3s ease;
     }
 
     .content {
@@ -464,48 +412,49 @@ if ($is_unlocked) {
 <body>
   <div class="sidebar" id="sidebar">
     <div>
-      <div class="logo">
-        <img src="Remorig.png" alt="Logo">
-        <h6 class="mt-2 mb-0 text-light fw-normal">CORE TRANSACTION 3</h6>
+      <div class="text-center p-3 border-bottom border-secondary">
+        <img src="Remorig.png" alt="Logo" style="width: 100px;">
+        <h6 class="mt-2 mb-0 text-light">CORE ADMIN</h6>
       </div>
       <nav class="mt-3">
-        <a href="admin.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'admin.php' ? 'active' : ''; ?>">
-          <i class="bi bi-speedometer2"></i> Dashboard
+         <nav class="mt-3" id="sidebarAccordion">
+        <a href="admin.php"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      
+        <a href="#crmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-people"></i> CRM</span><i class="bi bi-chevron-down small"></i>
         </a>
-
-        <a href="#crmSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-people"></i> CRM</span>
-          <i class="bi bi-chevron-down" style="font-size: 0.8em;"></i>
-        </a>
-        
-        <div class="collapse <?php echo (basename($_SERVER['PHP_SELF']) == 'CRM.php' || basename($_SERVER['PHP_SELF']) == 'customer_feedback.php') ? 'show' : ''; ?>" id="crmSubmenu" style="background: rgba(0,0,0,0.2);">
-          <a href="CRM.php" class="ps-4 <?php echo basename($_SERVER['PHP_SELF']) == 'CRM.php' ? 'active' : ''; ?>" style="font-size: 0.9em;">
-            <i class="bi bi-dot"></i> CRM Dashboard
-          </a>
-          <a href="customer_feedback.php" class="ps-4 <?php echo basename($_SERVER['PHP_SELF']) == 'customer_feedback.php' ? 'active' : ''; ?>" style="font-size: 0.9em;">
-            <i class="bi bi-dot"></i> Customer Feedback
-          </a>
+        <div class="collapse show" id="crmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="CRM.php" class="ps-4 active"><i class="bi bi-dot"></i> CRM Dashboard</a>
+            <a href="customer_feedback.php" class="ps-4"><i class="bi bi-dot"></i> Customer Feedback</a>
+            <a href="admin_ratings.php" class="ps-4"><i class="bi bi-dot"></i> Shipment Ratings</a>
         </div>
 
-        <a href="#csmSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-file-text"></i> Contract & SLA</span>
-          <i class="bi bi-chevron-down" style="font-size: 0.8em;"></i>
+        <a href="#csmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-file-text"></i> Contract & SLA</span><i class="bi bi-chevron-down small"></i>
         </a>
-        <div class="collapse <?php echo (basename($_SERVER['PHP_SELF']) == 'Admin_contracts.php' || basename($_SERVER['PHP_SELF']) == 'Admin_shipments.php') ? 'show' : ''; ?>" id="csmSubmenu" style="background: rgba(0,0,0,0.2);">
-          <a href="Admin_contracts.php" class="ps-4 <?php echo basename($_SERVER['PHP_SELF']) == 'Admin_contracts.php' ? 'active' : ''; ?>" style="font-size: 0.9em;">
-            <i class="bi bi-dot"></i> Manage Contracts
-          </a>
-          <a href="Admin_shipments.php" class="ps-4 <?php echo basename($_SERVER['PHP_SELF']) == 'Admin_shipments.php' ? 'active' : ''; ?>" style="font-size: 0.9em;">
-            <i class="bi bi-dot"></i> SLA Monitoring
-          </a>
+        <div class="collapse" id="csmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="admin_contracts.php" class="ps-4"><i class="bi bi-dot"></i> Manage Contracts</a>
+            <a href="admin_shipments.php" class="ps-4"><i class="bi bi-dot"></i> SLA Monitoring</a>
         </div>
 
-        <a href="E-Doc.php"><i class="bi bi-folder2-open"></i> E-Docs</a>
+        <a href="E-Doc.php"><i class="bi bi-folder2-open"></i> E-Documentation</a>
+        <a href="admin_completed.php"><i class="bi bi-check-circle-fill"></i> Completed Trans.</a>
         <a href="BIFA.php"><i class="bi bi-graph-up"></i> BI & Freight Analytics</a>
+        <a href="admin_reports.php">
+       <i class="bi bi-file-earmark-bar-graph"></i> Reports Generation
+        </a>
         <a href="activity-log.php"><i class="bi bi-clock-history"></i> Activity Log</a>
-        <a href="Archive.php"><i class="bi bi-archive"></i> Archived Docs</a>
+        
+        <a href="#archiveSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-archive"></i> Archived</span> <i class="bi bi-chevron-down small"></i>
+        </a>
+        <div class="collapse" id="archiveSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="Archive.php" class="ps-4"><i class="bi bi-dot"></i> Documents</a>
+            <a href="Archive_CRM.php" class="ps-4"><i class="bi bi-dot"></i> Customers</a>
+        </div>
 
         <a href="logout.php" class="border-top mt-3"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </nav>
       </nav>
     </div>
   </div>
@@ -649,6 +598,7 @@ if ($is_unlocked) {
                     $msgText = 'Action completed.';
                     if($m == 'updated') { $alertClass = 'info'; $msgText = 'Account updated.'; }
                     if($m == 'added') { $msgText = 'Account added successfully.'; }
+                    if($m == 'archived') { $msgText = 'Customer archived successfully.'; }
                 ?>
                     <div class="alert alert-<?= $alertClass ?> d-flex align-items-center mb-0">
                         <i class="bi bi-check-circle-fill me-2"></i> <?= $msgText ?>
@@ -714,7 +664,8 @@ if ($is_unlocked) {
                           onclick="openEdit(<?= $row['id'] ?>, '<?= h(addslashes($row['username'])) ?>', '<?= h(addslashes($row['email'])) ?>', '<?= h(addslashes($row['phone_number'])) ?>', '<?= h(addslashes($row['gender'])) ?>', '<?= h(addslashes($row['role'])) ?>')">
                           <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <a href="CRM.php?archive=<?= $row['id'] ?>" class="btn btn-sm btn-outline-secondary archive-btn" title="Archive">
+                        <a href="Archive_CRM.php?archive_id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-secondary archive-btn" title="Archive"
+                            onclick="return confirm('Are you sure you want to archive this customer?');">
                           <i class="bi bi-archive-fill"></i>
                         </a>
                       </div>
@@ -797,25 +748,16 @@ if ($is_unlocked) {
       document.getElementById('mainContent').classList.toggle('expanded');
     });
 
-    // Sidebar Accordion Logic (Original)
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    dropdownToggles.forEach(toggle => {
-      toggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        const currentMenu = toggle.nextElementSibling;
-        document.querySelectorAll('.dropdown-content').forEach(menu => {
-          if (menu !== currentMenu) menu.classList.remove('show');
-        });
-        currentMenu.classList.toggle('show');
-      });
+    // Keep active menu open based on current page
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        if (link.getAttribute('href') === window.location.pathname.split("/").pop()) {
+            link.classList.add('active');
+            let parentCollapse = link.closest('.collapse');
+            if (parentCollapse) {
+                new bootstrap.Collapse(parentCollapse, { toggle: false }).show();
+            }
+        }
     });
-
-    // Keep dropdown open based on URL
-    const path = window.location.pathname.split("/").pop();
-    if (path === "CRM.php" || path === "customer_feedback.php") {
-      const crmMenu = document.querySelector('#crmSubmenu');
-      if(crmMenu) crmMenu.classList.add('show');
-    }
 
     // Filter Table Logic
     const searchBox = document.getElementById('searchBox');

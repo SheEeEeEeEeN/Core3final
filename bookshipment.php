@@ -93,7 +93,7 @@ if ($input && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $shipmentId = mysqli_insert_id($conn);
-    $trackingCode = "PO-C3-" . str_pad($shipmentId, 5, "0", STR_PAD_LEFT);
+    $trackingCode = "INV-C3-" . str_pad($shipmentId, 5, "0", STR_PAD_LEFT);
 
     // 4. GENERATE INVOICE (PDF)
     $pdfFilename = "Invoice_Placeholder.pdf";
@@ -119,6 +119,9 @@ if ($input && $_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
 
+    
+
+
     // 5. INSERT INTO LOCAL DATABASE (PAYMENTS)
     $payStatus = ($method == 'online') ? 'Paid' : 'Pending';
     mysqli_query($conn, "INSERT INTO payments (user_id, shipment_id, invoice_number, amount, payment_date, status, method, reference_no, invoice_image) 
@@ -137,16 +140,20 @@ if ($input && $_SERVER['REQUEST_METHOD'] === 'POST') {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($syncData));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Prevent hanging if Core 1 is offline or slow
     curl_exec($ch);
     curl_close($ch);
+
+
 
     // 7. RETURN SUCCESS
     // Dagdagan natin ng 'shipment_id' para magamit sa link
     echo json_encode([
-      'success' => true,
-      'message' => 'Booked Successfully',
-      'invoice_file' => $pdfFilename,
-      'shipment_id' => $shipmentId // <--- IMPORTANTE ITO
+    'success'      => true,
+    'shipment_id'  => $shipmentId,
+    'tracking_code'=> $trackingCode,
+    'invoice_file' => $pdfFilename,
+    'message'      => 'Shipment saved successfully'
     ]);
     exit;
   } catch (Exception $e) {
@@ -1569,44 +1576,96 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       new bootstrap.Modal(document.getElementById("inputPreviewModal")).show();
     }
 
-    document.getElementById("finalConfirmBtn").addEventListener("click", async function(e) { // <--- Lagyan mo ng 'e'
-      e.preventDefault(); // <--- Idagdag mo ito para hindi mag-refresh ang page!
+document.getElementById("finalConfirmBtn").addEventListener("click", async function(e) {
+    e.preventDefault();
 
-      console.log("📢 PININDOT MO AKO! (Start of Process)"); // <--- Sound Check
+    console.log("📢 PININDOT MO AKO! (Start of Process)");
 
-      const btn = document.getElementById("finalConfirmBtn");
-      // ... rest of your code ...
-      btn.disabled = true;
-      btn.innerText = "Booking...";
+    const btn = document.getElementById("finalConfirmBtn");
+    btn.disabled = true;
+    btn.innerText = "Booking...";
 
-      const payload = Object.fromEntries(new FormData(document.getElementById('shipmentForm')).entries());
-      // ... (Yung mga append logic mo para sa hidden fields, retain mo lang) ...
-      payload.origin_island = document.getElementById('hiddenOriginIsland').value;
-      payload.destination_island = document.getElementById('hiddenDestIsland').value;
-      payload.payment_method = document.getElementById('selectedPaymentMethod').value;
-      payload.bank_name = document.getElementById('selectedBankName').value;
-      payload.ai_estimated_time = document.getElementById('aiPredictionTime').textContent;
+    const payload = Object.fromEntries(new FormData(document.getElementById('shipmentForm')).entries());
 
-      bootstrap.Modal.getInstance(document.getElementById("inputPreviewModal")).hide();
+   
+    payload.origin_island      = document.getElementById('hiddenOriginIsland').value;
+    payload.destination_island = document.getElementById('hiddenDestIsland').value;
+    payload.payment_method     = document.getElementById('selectedPaymentMethod').value;
+    payload.bank_name          = document.getElementById('selectedBankName').value;
+    payload.ai_estimated_time  = document.getElementById('aiPredictionTime').textContent.trim() || 'Calculating...';
 
-      try {
-        // Direct call sa API
-        const res = await fetch("bookshipment.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
+    bootstrap.Modal.getInstance(document.getElementById("inputPreviewModal")).hide();
+
+    Swal.fire({
+        title: 'Processing Booking...',
+        text: 'Please wait while we generate your invoice and save details.',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+        // Step 1: Save to local system (your classmate's PHP)
+        const localRes = await fetch("bookshipment.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
         });
-        const result = await res.json();
-        const msg = document.getElementById("responseMessage");
 
-        if (result.success) {
-          // BAGONG LOGIC: Ituro sa print_invoice.php gamit ang ID
-          const invoiceLink = "print_invoice.php?id=" + result.shipment_id;
-          const pdfLink = "invoices_img/" + result.invoice_file;
+        if (!localRes.ok) {
+            throw new Error(`Server responded with status ${localRes.status}`);
+        }
 
-          Swal.fire({
+        const result = await localRes.json();
+
+        if (!result.success) {
+            throw new Error(result.error || "Booking failed on server");
+        }
+
+        const financePayload = {
+            user_id:        payload.user_id || 1,  
+            amount:         Number(payload.price_php),
+            Arrival_date:   payload.target_date || new Date().toISOString().split('T')[0],
+            status:         payload.payment_status || 'Pending',
+            method:         payload.payment_method,
+            reference_no:   result.tracking_code || `PO-C3-${result.shipment_id.toString().padStart(5,'0')}`,
+            invoice_image:  result.invoice_file || "Invoice_Placeholder.pdf",
+            Description:    `The Destination is ${payload.destination_address || 'N/A'} with the Origin of ${payload.origin_address || 'N/A'} and the Package Type is ${payload.package_type || 'N/A'} with the Weight of ${payload.weight || 0}kg. The Distance is ${payload.distance_km || 0}km.`
+        };
+
+        console.log("Sending to Finance API:", financePayload);
+
+        const financeRes = await fetch("https://finance.slatefreight-ph.com/api/ar/payment.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(financePayload)
+        });
+
+        const financeData = await financeRes.json();
+        if (!financeRes.ok || financeData.success === false) {
+            console.warn("Finance sync failed:", financeData);
+            Swal.fire({
+                icon: 'warning',
+                title: 'Booking Saved (Finance sync failed)',
+                html: `
+                    <p>Shipment ID: ${result.shipment_id}</p>
+                    <p style="color:#e67e22;">Finance system could not be updated right now (${financeData.message || 'HTTP ' + financeRes.status}).</p>
+                    <p>You can try syncing later or contact support.</p>
+                `,
+                confirmButtonColor: '#f39c12'
+            });
+        }
+
+        const invoiceLink = "print_invoice.php?id=" + result.shipment_id;
+        const pdfLink = "invoices_img/" + result.invoice_file;
+
+        Swal.fire({
             icon: 'success',
             title: 'Booking Successful!',
             html: `
@@ -1623,25 +1682,23 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
             showConfirmButton: false,
             allowOutsideClick: false,
             showCloseButton: true
-          }).then(() => {
-             // Optional: reload page or reset form
-             // window.location.reload();
-          });
+        }).then(() => {
+        });
 
-        } else {
-           Swal.fire({
+    } catch (err) {
+        console.error("Booking process failed:", err);
+
+        Swal.fire({
             icon: 'error',
             title: 'Booking Failed',
-            text: result.error,
+            text: err.message || 'Unable to submit booking. Please check your connection.',
             confirmButtonColor: '#dc3545'
-          });
-          btn.disabled = false;
-        }
-      } catch (e) {
-        console.error(e);
+        });
+    } finally {
         btn.disabled = false;
-      }
-    });
+        btn.innerText = "Confirm & Book";
+    }
+});
 
     document.getElementById("acceptContract").addEventListener("click", () => {
       bootstrap.Modal.getInstance(document.getElementById("contractModal")).hide();

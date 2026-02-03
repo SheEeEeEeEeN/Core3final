@@ -451,56 +451,104 @@ $result = mysqli_query($conn, $query);
         }
     }
 
-    async function submitReceive() {
-        const id = document.getElementById('receiveShipmentId').value;
-        const fileInput = document.getElementById('proofImage');
+  async function submitReceive() {
+    const id = document.getElementById('receiveShipmentId').value.trim();
+    const fileInput = document.getElementById('proofImage');
 
-        if(fileInput.files.length === 0) {
-            alert("Please upload a proof of delivery photo first.");
-            return;
+    if (!id) {
+        alert("Shipment ID is missing.");
+        return;
+    }
+
+    if (fileInput.files.length === 0) {
+        alert("Please upload a proof of delivery photo first.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'update_status');
+    formData.append('status', 'Delivered');
+    formData.append('id', id);
+    formData.append('proof_image', fileInput.files[0]);
+
+    const btn = document.querySelector('#receiveModal .btn-success');
+    const oldText = btn.innerText;
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    try {
+        const res = await fetch('update_shipment_api.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status} - ${res.statusText}`);
         }
 
-        const formData = new FormData();
-        formData.append('id', id);
-        formData.append('status', 'Delivered');
-        formData.append('action', 'update_status');
-        formData.append('proof_image', fileInput.files[0]);
-
-        const btn = document.querySelector('#receiveModal .btn-success');
-        const oldText = btn.innerText;
-        btn.disabled = true;
-        btn.innerText = "Uploading...";
+        const text = await res.text();
+        let data;
 
         try {
-            // RELATIVE PATH - TAMA
-            const res = await fetch('update_shipment_api.php', { 
-                method: 'POST', body: formData 
-            });
-            const text = await res.text();
-            
-            try {
-                const data = JSON.parse(text);
-                if(data.success) {
-                    alert("Package marked as delivered! Photo uploaded.");
-                    location.reload(); 
-                } else {
-                    alert("Error: " + (data.message || "Unknown error"));
-                    btn.disabled = false;
-                    btn.innerText = oldText;
-                }
-            } catch(e) {
-                console.error("Non-JSON Response:", text);
-                alert("Server error. Check console.");
-                btn.disabled = false;
-                btn.innerText = oldText;
-            }
-        } catch (err) { 
-            console.error(err);
-            alert("Connection error."); 
-            btn.disabled = false;
-            btn.innerText = oldText;
+            data = JSON.parse(text);
+        } catch (parseErr) {
+            console.error("Server returned non-JSON:", text);
+            throw new Error("Invalid response from server");
         }
+
+        if (!data.success) {
+            throw new Error(data.message || "Unknown server error");
+        }
+
+        console.log("Delivery successful → payment info:", data.shipment);
+
+
+        alert(`Package #${id} marked as delivered!\nInvoice: ${data.shipment.invoice_number || 'N/A'}\nAmount: ₱${data.shipment.price || 'N/A'}`);
+
+
+        try {
+            const notifyRes = await fetch('https://finance.slatefreight-ph.com/api/ar/generatereciept.php', {  
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                   shipment_id:    id,
+                    status:         'Delivered',
+                    invoice_number: data.shipment.invoice_number || null,
+                    user_id:        data.shipment.user_id       || null,
+                    method:         data.shipment.payment_method        || null,   
+                    amount:         data.shipment.price         || null,
+                    receiver_name:  data.shipment.receiver_name || null,
+                    from:          data.shipment.origin_island || null,
+                    to:            data.shipment.destination_address || null,
+                    packedes:      data.shipment.package_description || null,
+                    type:          data.shipment.package_type || null
+                
+                })
+            });
+
+            if (!notifyRes.ok) {
+                console.warn("Wrong Api Response:", await notifyRes.text());
+        
+            } else {
+                console.log("Successfully Insert");
+            }
+        } catch (notifyErr) {
+            console.error("Failed to reach receipt endpoint:", notifyErr);
+
+        }
+
+        location.reload();
+
+    } catch (err) {
+        console.error("Delivery failed:", err);
+        alert("Error: " + (err.message || "Something went wrong. Check console."));
+    } finally {
+        btn.disabled = false;
+        btn.innerText = oldText;
     }
+}
 
     // --- VIEW PROOF ---
     function viewProof(imagePath) {
@@ -569,7 +617,9 @@ $result = mysqli_query($conn, $query);
 </script>
 
 <script>
-    // AUTO-CHECK NOTIFICATIONS
+
+    
+  
     function fetchNotifications() {
         fetch('api/get_notifications.php')
         .then(response => response.json())

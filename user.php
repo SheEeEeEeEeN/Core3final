@@ -393,6 +393,7 @@ $countsArr = array_values($counts); $revenuesArr = array_values($revenues);
             <li class="nav-item mb-2"><a href="My_shipment.php" class="nav-link text-white"><i class="bi bi-truck fs-5 me-2"></i>My Shipments</a></li>
             <li class="nav-item mb-2"><a href="shiphistory.php" class="nav-link text-white"><i class="bi bi-clock-history fs-5 me-2"></i>History</a></li>
             <li class="nav-item mb-2"><a href="feedback.php" class="nav-link text-white"><i class="bi bi-chat-dots fs-5 me-2"></i>Feedback</a></li>
+            <li class="nav-item mb-2"><a href="rate_shipment.php" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-star-fill fs-5"></i><span>Rate Shipments</span></a></li>
         </ul>
     </div>
 

@@ -13,7 +13,7 @@ include('file_handler.php');
 $VAULT_PASSWORD = "core3"; 
 $TIMEOUT_DURATION = 10; // 10 Seconds Timeout
 
-// Handle Unlock Request
+// Handle Unlock RequestS
 $vault_error = "";
 if (isset($_POST['btn_unlock'])) {
     $input_pass = $_POST['vault_pass'];
@@ -67,7 +67,23 @@ $page = 1;
 $total_results = 0;
 
 if ($is_unlocked) {
+    // --- ARCHIVE LOGIC ---
+    // --- ARCHIVE LOGIC MOVED TO Archive.php ---
+    
+    // FETCH ARCHIVED SYSTEM DOCS (To hide them)
+    $archived_virtual = [];
+    $av_q = $conn->query("SELECT title, doc_type FROM archive_doc WHERE filename IS NULL OR filename = '' OR filename LIKE 'TRK-%' OR filename LIKE '%_Contract.pdf'");
+    while($av = $av_q->fetch_assoc()){
+        $archived_virtual[] = $av['title'] . '_' . $av['doc_type'];
+    }
+
+
     // --- UPLOAD LOGIC ---
+    if (isset($_GET['msg']) && $_GET['msg'] == 'archived') {
+        $msg = "Document archived successfully.";
+        $msgType = "success";
+    }
+
     if (isset($_POST['btn_upload'])) {
         $tracking_num = mysqli_real_escape_string($conn, $_POST['tracking_number']);
         $doc_type = mysqli_real_escape_string($conn, $_POST['doc_type']);
@@ -100,6 +116,10 @@ if ($is_unlocked) {
     $res_ship = $conn->query($sql_ship);
     while($row = $res_ship->fetch_assoc()){
         $trk = "TRK-" . str_pad($row['id'], 6, "0", STR_PAD_LEFT);
+        
+        // Skip if archived
+        if(in_array($trk . '_print_invoice', $archived_virtual)) continue;
+
         $all_docs[] = [
             'category' => 'System', 'ref_id' => $trk, 'name' => $row['sender_name'],
             'doc_type' => 'print_invoice', 'file_name' => $trk . '_print_invoice.pdf', 'file_ext' => 'pdf',
@@ -115,6 +135,9 @@ if ($is_unlocked) {
     $sql_cont .= " ORDER BY c.created_at DESC LIMIT 100";
     $res_cont = $conn->query($sql_cont);
     while($row = $res_cont->fetch_assoc()){
+        // Skip if archived
+        if(in_array($row['contract_number'] . '_Contract', $archived_virtual)) continue;
+
         $all_docs[] = [
             'category' => 'System', 'ref_id' => $row['contract_number'], 'name' => $row['client_name'],
             'doc_type' => 'Contract', 'file_name' => $row['contract_number'] . '_Contract.pdf', 'file_ext' => 'pdf',
@@ -213,27 +236,44 @@ if ($is_unlocked) {
         <h6 class="mt-2 mb-0 text-light">CORE ADMIN</h6>
       </div>
       <nav class="mt-3">
+         <nav class="mt-3" id="sidebarAccordion">
         <a href="admin.php"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      
         <a href="#crmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
             <span><i class="bi bi-people"></i> CRM</span><i class="bi bi-chevron-down small"></i>
         </a>
-        <div class="collapse" id="crmSubmenu" style="background: rgba(0,0,0,0.2);">
+        <div class="collapse" id="crmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
             <a href="CRM.php" class="ps-4"><i class="bi bi-dot"></i> CRM Dashboard</a>
             <a href="customer_feedback.php" class="ps-4"><i class="bi bi-dot"></i> Customer Feedback</a>
+            <a href="admin_ratings.php" class="ps-4"><i class="bi bi-dot"></i> Shipment Ratings</a>
         </div>
+
         <a href="#csmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
             <span><i class="bi bi-file-text"></i> Contract & SLA</span><i class="bi bi-chevron-down small"></i>
         </a>
-        <div class="collapse" id="csmSubmenu" style="background: rgba(0,0,0,0.2);">
+        <div class="collapse" id="csmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
             <a href="admin_contracts.php" class="ps-4"><i class="bi bi-dot"></i> Manage Contracts</a>
             <a href="admin_shipments.php" class="ps-4"><i class="bi bi-dot"></i> SLA Monitoring</a>
         </div>
-        <a href="E-Doc.php" class="active"><i class="bi bi-folder2-open"></i> E-Docs</a>
+
+        <a href="E-Doc.php" class="active"><i class="bi bi-folder2-open"></i> E-Documentation</a>
         <a href="admin_completed.php"><i class="bi bi-check-circle-fill"></i> Completed Trans.</a>
-        <a href="BIFA.php"><i class="bi bi-graph-up"></i> BI & Analytics</a>
+        <a href="BIFA.php"><i class="bi bi-graph-up"></i> BI & Freight Analytics</a>
+        <a href="admin_reports.php">
+       <i class="bi bi-file-earmark-bar-graph"></i> Reports Generation
+        </a>
         <a href="activity-log.php"><i class="bi bi-clock-history"></i> Activity Log</a>
-        <a href="Archive.php"><i class="bi bi-archive"></i> Archives</a>
+        
+        <a href="#archiveSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-archive"></i> Archived</span> <i class="bi bi-chevron-down small"></i>
+        </a>
+        <div class="collapse" id="archiveSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="Archive.php" class="ps-4"><i class="bi bi-dot"></i> Documents</a>
+            <a href="Archive_CRM.php" class="ps-4"><i class="bi bi-dot"></i> Customers</a>
+        </div>
+
         <a href="logout.php" class="border-top mt-3"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </nav>
       </nav>
     </div>
   </div>
@@ -352,15 +392,24 @@ if ($is_unlocked) {
                             <td class="small font-monospace"><?php echo $doc['file_name']; ?></td>
                             <td><?php echo date('M d, Y', strtotime($doc['date'])); ?></td>
                             <td class="text-end">
-                                <?php if($doc['is_virtual']): ?>
-                                    <button onclick="window.open('<?php echo $doc['link']; ?>', '_blank')" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-printer-fill"></i> View
-                                    </button>
-                                <?php else: ?>
-                                    <a href="<?php echo $doc['link']; ?>" target="_blank" class="btn btn-sm btn-outline-dark">
-                                        <i class="bi bi-download"></i> DL
-                                    </a>
-                                <?php endif; ?>
+                                <a href="<?php echo $doc['link']; ?>" target="_blank" class="btn btn-sm btn-primary me-1">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                <?php if(!$doc['is_virtual']): ?>
+    <a href="Archive.php?archive_track=<?php echo urlencode($doc['ref_id']); ?>&archive_file=<?php echo urlencode($doc['file_name']); ?>" 
+       onclick="return confirm('Are you sure you want to archive this document?');" 
+       class="btn btn-sm btn-secondary">
+        <i class="bi bi-archive"></i> Archive
+    </a>
+<?php else: ?>
+    <!-- Virtual Archive Button -->
+    <a href="Archive.php?archive_track=<?php echo urlencode($doc['ref_id']); ?>&archive_file=<?php echo urlencode($doc['file_name']); ?>&virtual=1&dtype=<?php echo urlencode($doc['doc_type']); ?>" 
+       onclick="return confirm('Are you sure you want to archive this system document?');" 
+       class="btn btn-sm btn-secondary">
+        <i class="bi bi-archive"></i> Archive
+    </a>
+<?php endif; ?>
+
                             </td>
                         </tr>
                         <?php endforeach; ?>

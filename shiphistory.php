@@ -59,82 +59,236 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: #4e73df;
-            --dark-bg: #1a1a2e;
-            --dark-card: #16213e;
-            --text-light: #f8f9fa;
-            --text-dark: #212529;
-            --shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+          --sidebar-width: 260px;
+          --primary-color: #4361ee;
+          /* Vibrant Blue */
+          --secondary-color: #f3f4f6;
+          --accent-color: #3f37c9;
+          --text-main: #2b2d42;
+          --text-secondary: #8d99ae;
+
+          /* Dark Mode Variables */
+          --dark-bg: #0f172a;
+          /* Slate 900 */
+          --dark-card: #1e293b;
+          /* Slate 800 */
+          --dark-border: #334155;
+          /* Slate 700 */
+          --dark-text-main: #f8fafc;
+          --dark-text-sec: #94a3b8;
+
+          --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+          --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.08);
+          --radius-md: 12px;
+          --radius-lg: 16px;
+        }
+
+        /* --- GLOBAL RESETS --- */
+        * {
+          box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: #f8f9fc;
-            color: var(--text-dark);
+          font-family: 'Poppins', sans-serif;
+          background-color: var(--secondary-color);
+          color: var(--text-main);
+          overflow-x: hidden;
         }
 
-        body.dark-mode {
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-        }
-
-        /* Sidebar */
+        /* --- SIDEBAR (UNCHANGED COLOR as requested) --- */
         .sidebar {
-            width: 260px;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            z-index: 1000;
-            transition: all .3s;
+          width: var(--sidebar-width);
+          height: 100vh;
+          position: fixed;
+          left: 0;
+          top: 0;
+          background: #2c3e50;
+          /* PRESERVED COLOR */
+          color: white;
+          z-index: 1040;
+          transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
         }
 
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar a {
-            display: block;
-            color: rgba(255, 255, 255, 0.8);
-            padding: .75rem 1.5rem;
-            text-decoration: none;
-            border-left: 3px solid transparent;
-            transition: .3s;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left: 3px solid white;
+        .sidebar-header {
+          padding: 2rem 1.5rem 1rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .content {
-            margin-left: 250px;
-            padding: 20px;
-            transition: all .3s;
+          margin-left: var(--sidebar-width);
+          padding: 30px;
+          transition: margin-left .3s cubic-bezier(0.4, 0, 0.2, 1);
+          min-height: 100vh;
         }
 
-        .content.expanded {
-            margin-left: 0;
+        /* --- NAVIGATION --- */
+        .nav-link {
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.7) !important;
+          transition: all 0.2s;
+          margin-bottom: 5px;
+          border-radius: 8px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+          color: #fff !important;
+          background: rgba(255, 255, 255, 0.1);
+          transform: translateX(5px);
+        }
+
+        .nav-link i {
+          margin-right: 10px;
+        }
+
+        /* --- CARDS & PANELS --- */
+        .panel,
+        .card {
+          background: white;
+          border-radius: var(--radius-lg);
+          border: none;
+          box-shadow: var(--shadow-md);
+          transition: transform 0.2s;
+        }
+
+        .panel {
+          padding: 2rem;
+          margin-bottom: 24px;
         }
 
         .header {
-            background-color: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
+          background: white;
+          border-radius: var(--radius-lg);
+          box-shadow: var(--shadow-sm);
+          padding: 1rem 1.5rem;
+          margin-bottom: 30px;
+          border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
-        /* Timeline CSS */
+        /* --- RESPONSIVE --- */
+        @media (max-width: 992px) {
+          .sidebar {
+            left: calc(var(--sidebar-width) * -1);
+          }
+
+          .sidebar.mobile-open {
+            left: 0;
+          }
+
+          .content {
+            margin-left: 0 !important;
+            padding: 15px;
+          }
+        }
+
+        .sidebar-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 1030;
+          display: none;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .sidebar-overlay.show {
+          display: block;
+          opacity: 1;
+        }
+
+        /* =========================================
+           DARK MODE OVERRIDES (COMPREHENSIVE) 
+           ========================================= */
+        body.dark-mode {
+          background-color: var(--dark-bg);
+          color: var(--dark-text-main);
+        }
+
+        /* Components */
+        body.dark-mode .panel,
+        body.dark-mode .card,
+        body.dark-mode .header,
+        body.dark-mode .modal-content,
+        body.dark-mode .dropdown-menu {
+          background-color: var(--dark-card) !important;
+          color: var(--dark-text-main);
+          border-color: var(--dark-border);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Fix Bootstrap Utilities in Dark Mode */
+        body.dark-mode .bg-white {
+          background-color: var(--dark-card) !important;
+        }
+
+        body.dark-mode .bg-light {
+          background-color: #1e293b !important;
+        }
+
+        /* Darker slate for bg-light */
+        body.dark-mode .bg-light-subtle {
+          background-color: #334155 !important;
+        }
+
+        /* Slate 700 */
+        body.dark-mode .text-muted {
+          color: var(--dark-text-sec) !important;
+        }
+
+        body.dark-mode .text-dark {
+          color: #fff !important;
+        }
+
+        /* Forms */
+        body.dark-mode .form-control,
+        body.dark-mode .form-select,
+        body.dark-mode .input-group-text,
+        body.dark-mode textarea {
+          background-color: #0f172a !important;
+          /* Extremely dark bg for inputs */
+          border-color: var(--dark-border) !important;
+          color: #fff !important;
+        }
+
+        body.dark-mode .form-control:focus {
+          border-color: var(--primary-color) !important;
+          box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.3);
+        }
+
+        body.dark-mode .list-group-item {
+          background-color: var(--dark-card);
+          border-color: var(--dark-border);
+          color: var(--dark-text-main);
+        }
+
+        /* Buttons */
+        body.dark-mode .btn-close {
+          filter: invert(1);
+        }
+
+        body.dark-mode .btn-outline-secondary {
+          color: #cbd5e1;
+          border-color: #cbd5e1;
+        }
+
+        body.dark-mode .btn-outline-secondary:hover {
+          color: #000;
+          background-color: #cbd5e1;
+        }
+
+
+        /* --- TIMELINE SPECIFIC CSS (Preserved) --- */
         .track-line {
             height: 4px;
             background-color: #e9ecef;
@@ -170,7 +324,7 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
             background: var(--primary-color);
             border-color: var(--primary-color);
             color: #fff;
-            box-shadow: 0 0 10px rgba(78, 115, 223, 0.5);
+            box-shadow: 0 0 10px rgba(67, 97, 238, 0.5); /* Updated color to match new primary */
         }
 
         .step-item.active .step-text {
@@ -182,41 +336,7 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
             font-size: 0.8rem;
             color: #6c757d;
         }
-
-        /* Dark Mode Overrides */
-        body.dark-mode .header {
-            background-color: var(--dark-card) !important;
-            color: var(--text-light) !important;
-        }
-
-        body.dark-mode .card {
-            background-color: var(--dark-card) !important;
-            color: var(--text-light) !important;
-            border-color: #2a3a5a !important;
-        }
-
-        body.dark-mode table,
-        body.dark-mode tbody tr {
-            background-color: var(--dark-card) !important;
-            color: var(--text-light) !important;
-        }
-
-        body.dark-mode table tbody tr:hover {
-            background-color: #2a3a5a !important;
-        }
-
-        body.dark-mode .modal-content {
-            background-color: var(--dark-card);
-            color: var(--text-light);
-            border: 1px solid #2a3a5a;
-        }
-
-        body.dark-mode .bg-light {
-            background-color: #243355 !important;
-            color: white;
-            border-color: #3a4b6e !important;
-        }
-
+        
         body.dark-mode .step-icon {
             background-color: #2c3e50;
             border-color: #495057;
@@ -225,18 +345,24 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
         body.dark-mode .track-line {
             background-color: #495057;
         }
-
-        body.dark-mode .btn-close {
-            filter: invert(1);
+        
+        body.dark-mode table,
+        body.dark-mode tbody tr {
+            background-color: var(--dark-card) !important;
+            color: var(--dark-text-main) !important;
         }
 
+        body.dark-mode table tbody tr:hover {
+            background-color: #2a3a5a !important;
+        }
+        
         .clickable-row {
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
         .clickable-row:hover {
-            background-color: rgba(78, 115, 223, 0.1) !important;
+            background-color: rgba(67, 97, 238, 0.1) !important; /* Updated to new primary color */
         }
     </style>
 </head>
@@ -244,16 +370,22 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
 <body>
     <div class="sidebar d-flex flex-column flex-shrink-0 p-3" id="sidebar">
         <div class="text-center mb-4 mt-2">
-            <img src="Remorig.png" alt="Logo" class="img-fluid mb-2" style="max-width: 140px;">
+            <img src="Remorig.png" alt="Freight Logo" class="img-fluid mb-2" style="max-width: 140px;">
             <h6 class="fw-semibold text-uppercase text-light-50 mb-0" style="font-size: 0.85rem;">Core Transaction 3</h6>
         </div>
+
         <hr class="text-light opacity-25">
+
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item mb-2"><a href="user.php" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-house-door-fill fs-5"></i><span>Dashboard</span></a></li>
             <li class="nav-item mb-2"><a href="bookshipment.php" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-truck fs-5"></i><span>Book Shipment</span></a></li>
+            <ul class="nav nav-pills flex-column mb-auto">
+
+            </ul>
             <li class="nav-item mb-2"><a href="My_shipment.php" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-truck fs-5"></i><span>My Shipments</span></a></li>
             <li class="nav-item mb-2"><a href="shiphistory.php" class="active nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-clock-history fs-5"></i><span>Shipment History</span></a></li>
-            <li class="nav-item mb-2"><a href="feedback.php" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-chat-dots fs-5"></i><span>Feedback & Notification</span></a></li>
+            <li class="nav-item mb-2"><a href="feedback.php" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-chat-dots fs-5"></i><span>Helpdesk Support</span></a></li>
+            <li class="nav-item mb-2"><a href="rate_shipment.php" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-3 hover-link"><i class="bi bi-star-fill fs-5"></i><span>Reviews</span></a></li>
         </ul>
     </div>
 

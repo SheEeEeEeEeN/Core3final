@@ -5,6 +5,38 @@ include('session.php');
 include('loading.html');
 requireRole('admin');
 
+requireRole('admin');
+
+// 1. AUTO-DELETE (Older than 1 Year)
+$conn->query("DELETE FROM archive_crm WHERE archived_at < NOW() - INTERVAL 1 YEAR");
+
+// 2. ARCHIVE LOGIC (Moved from CRM.php)
+if (isset($_GET['archive_id'])) {
+    $id = intval($_GET['archive_id']);
+    $res = $conn->query("SELECT * FROM accounts WHERE id = $id");
+
+    if ($res && $res->num_rows > 0) {
+        $row = $res->fetch_assoc();
+        $stmt = $conn->prepare("INSERT INTO archive_crm (username, email, phone_number, gender, role, archived_at) VALUES (?, ?, ?, ?, ?, NOW())");
+        $stmt->bind_param("sssss", $row['username'], $row['email'], $row['phone_number'], $row['gender'], $row['role']);
+        if($stmt->execute()){
+            $conn->query("DELETE FROM accounts WHERE id = $id");
+             // $_SESSION['alert'] = ['title' => 'Archived!', 'text' => 'Customer archived successfully.', 'icon' => 'success'];
+        }
+    }
+    header("Location: CRM.php?msg=archived");
+    exit;
+}
+
+// 3. PERMANENT DELETE
+if (isset($_GET['delete_id'])) {
+    $id = intval($_GET['delete_id']);
+    $conn->query("DELETE FROM archive_crm WHERE id = $id");
+    $_SESSION['alert'] = ['title' => 'Deleted!', 'text' => 'Customer permanently deleted.', 'icon' => 'success'];
+    header("Location: Archive_CRM.php");
+    exit;
+}
+
 // Handle restore
 if (isset($_GET['restore'])) {
     $id = intval($_GET['restore']);
@@ -376,31 +408,49 @@ body.dark-mode .btn-primary:hover {
 <body>
         <div class="sidebar" id="sidebar">
     <div>
-      <div class="logo">
-        <img src="Remorig.png" alt="Logo">
-        <h6 class="mt-2 mb-0 text-light fw-normal">CORE TRANSACTION 3</h6>
+      <div class="text-center p-3 border-bottom border-secondary">
+        <img src="Remorig.png" alt="Logo" style="width: 100px;">
+        <h6 class="mt-2 mb-0 text-light">CORE ADMIN</h6>
       </div>
       <nav class="mt-3">
+         <nav class="mt-3" id="sidebarAccordion">
         <a href="admin.php"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <div class="dropdown-container">
-        <a href="#" class="dropdown-toggle"><i class="bi bi-people-fill me-2"></i> CRM </a>
-        <div class="dropdown-content">
-          <a href="CRM.php"><i class="bi bi-circle"></i> Overview</a>
-          <a href="customer_feedback.php"><i class="bi bi-chat-dots"></i> Customer Feedback</a>
+      
+        <a href="#crmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-people"></i> CRM</span><i class="bi bi-chevron-down small"></i>
+        </a>
+        <div class="collapse" id="crmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="CRM.php" class="ps-4"><i class="bi bi-dot"></i> CRM Dashboard</a>
+            <a href="customer_feedback.php" class="ps-4"><i class="bi bi-dot"></i> Customer Feedback</a>
+            <a href="admin_ratings.php" class="ps-4"><i class="bi bi-dot"></i> Shipment Ratings</a>
         </div>
-      </div>
-        <a href="CSM.php"><i class="bi bi-file-text"></i> Contract & SLA</a>
-        <a href="E-Doc.php"><i class="bi bi-folder2-open"></i> E-Docs</a>
-        <a href="BIFA.php"><i class="bi bi-graph-up"></i> BI &amp; Freight Analytics</a>
+
+        <a href="#csmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-file-text"></i> Contract & SLA</span><i class="bi bi-chevron-down small"></i>
+        </a>
+        <div class="collapse" id="csmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="admin_contracts.php" class="ps-4"><i class="bi bi-dot"></i> Manage Contracts</a>
+            <a href="admin_shipments.php" class="ps-4"><i class="bi bi-dot"></i> SLA Monitoring</a>
+        </div>
+
+        <a href="E-Doc.php"><i class="bi bi-folder2-open"></i> E-Documentation</a>
+        <a href="admin_completed.php"><i class="bi bi-check-circle-fill"></i> Completed Trans.</a>
+        <a href="BIFA.php"><i class="bi bi-graph-up"></i> BI & Freight Analytics</a>
+        <a href="admin_reports.php">
+       <i class="bi bi-file-earmark-bar-graph"></i> Reports Generation
+        </a>
         <a href="activity-log.php"><i class="bi bi-clock-history"></i> Activity Log</a>
-        <div class="dropdown-container">
-        <a href="#" class="dropdown-toggle"><i class="bi bi-archive-fill"></i> Archived</a>
-        <div class="dropdown-content">
-          <a href="Archive.php"><i class="bi bi-archive"></i> Documents</a>
-          <a href="Archive_CRM.php"><i class="bi bi-people"></i> Customers</a>
+        
+        <a href="#archiveSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-archive"></i> Archived</span> <i class="bi bi-chevron-down small"></i>
+        </a>
+        <div class="collapse show" id="archiveSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="Archive.php" class="ps-4"><i class="bi bi-dot"></i> Documents</a>
+            <a href="Archive_CRM.php" class="ps-4 active"><i class="bi bi-dot"></i> Customers</a>
         </div>
-      </div>
-        <a href="logout.php" class="border-top"><i class="bi bi-box-arrow-right"></i> Logout</a>
+
+        <a href="logout.php" class="border-top mt-3"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </nav>
       </nav>
     </div>
   </div>
@@ -446,8 +496,11 @@ body.dark-mode .btn-primary:hover {
                                     <td>" . htmlspecialchars($row['role']) . "</td>
                                     <td>" . htmlspecialchars($row['archived_at']) . "</td>
                                     <td>
-                                       <a href='Archive_CRM.php?restore=" . $row['id'] . "' class='btn btn-success btn-sm restore'>
+                                        <a href='Archive_CRM.php?restore=" . $row['id'] . "' class='btn btn-success btn-sm restore'>
                                             <i class='bi bi-arrow-clockwise'></i> Restore
+                                        </a>
+                                        <a href='Archive_CRM.php?delete_id=" . $row['id'] . "' class='btn btn-danger btn-sm delete-btn'>
+                                            <i class='bi bi-trash'></i> Delete
                                         </a>
 
                                     </td>
@@ -519,6 +572,27 @@ document.querySelectorAll('.sidebar > div nav > a').forEach(link => {
   if (link.getAttribute('href') === path) link.classList.add('active');
 });
 
+
+// SweetAlert delete confirmation
+document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+        e.preventDefault();
+        const url = this.href;
+        Swal.fire({
+            title: 'Delete Permanently?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    });
+});
 
 // SweetAlert restore confirmation
 document.querySelectorAll(".restore").forEach(btn => {

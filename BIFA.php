@@ -188,26 +188,44 @@ while($row = $cQ->fetch_assoc()){
         <h6 class="mt-2 mb-0 text-light">CORE ADMIN</h6>
       </div>
       <nav class="mt-3">
+         <nav class="mt-3" id="sidebarAccordion">
         <a href="admin.php"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      
         <a href="#crmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
             <span><i class="bi bi-people"></i> CRM</span><i class="bi bi-chevron-down small"></i>
         </a>
-        <div class="collapse" id="crmSubmenu" style="background: rgba(0,0,0,0.2);">
+        <div class="collapse" id="crmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
             <a href="CRM.php" class="ps-4"><i class="bi bi-dot"></i> CRM Dashboard</a>
             <a href="customer_feedback.php" class="ps-4"><i class="bi bi-dot"></i> Customer Feedback</a>
+            <a href="admin_ratings.php" class="ps-4"><i class="bi bi-dot"></i> Shipment Ratings</a>
         </div>
+
         <a href="#csmSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
             <span><i class="bi bi-file-text"></i> Contract & SLA</span><i class="bi bi-chevron-down small"></i>
         </a>
-        <div class="collapse" id="csmSubmenu" style="background: rgba(0,0,0,0.2);">
+        <div class="collapse" id="csmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
             <a href="admin_contracts.php" class="ps-4"><i class="bi bi-dot"></i> Manage Contracts</a>
             <a href="admin_shipments.php" class="ps-4"><i class="bi bi-dot"></i> SLA Monitoring</a>
         </div>
-        <a href="E-Doc.php"><i class="bi bi-folder2-open"></i> E-Docs</a>
-        <a href="BIFA.php" class="active"><i class="bi bi-graph-up"></i> BI & Analytics</a>
+
+        <a href="E-Doc.php"><i class="bi bi-folder2-open"></i> E-Documentation</a>
+        <a href="admin_completed.php"><i class="bi bi-check-circle-fill"></i> Completed Trans.</a>
+        <a href="BIFA.php" class="active"><i class="bi bi-graph-up"></i> BI & Freight Analytics</a>
+        <a href="admin_reports.php">
+       <i class="bi bi-file-earmark-bar-graph"></i> Reports Generation
+        </a>
         <a href="activity-log.php"><i class="bi bi-clock-history"></i> Activity Log</a>
-        <a href="Archive.php"><i class="bi bi-archive"></i> Archives</a>
+        
+        <a href="#archiveSubmenu" data-bs-toggle="collapse" class="d-flex justify-content-between">
+            <span><i class="bi bi-archive"></i> Archived</span> <i class="bi bi-chevron-down small"></i>
+        </a>
+        <div class="collapse" id="archiveSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
+            <a href="Archive.php" class="ps-4"><i class="bi bi-dot"></i> Documents</a>
+            <a href="Archive_CRM.php" class="ps-4"><i class="bi bi-dot"></i> Customers</a>
+        </div>
+
         <a href="logout.php" class="border-top mt-3"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </nav>
       </nav>
     </div>
   </div>
