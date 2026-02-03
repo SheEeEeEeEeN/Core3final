@@ -95,7 +95,7 @@ $totalRatings = $stats['total'];
             <span><i class="bi bi-people"></i> CRM</span><i class="bi bi-chevron-down small"></i>
         </a>
         <div class="collapse show" id="crmSubmenu" data-bs-parent="#sidebarAccordion" style="background: rgba(0,0,0,0.2);">
-            <a href="CRM.php" class="ps-4"><i class="bi bi-dot"></i> CRM Dashboard</a>
+            <a href="CRM.php" class="ps-4"><i class="bi bi-dot"></i> CRM Dashboard</a>clear
             <a href="customer_feedback.php" class="ps-4"><i class="bi bi-dot"></i> Customer Feedback</a>
             <a href="admin_ratings.php" class="ps-4 active"><i class="bi bi-dot"></i> Shipment Ratings</a>
         </div>
