@@ -259,8 +259,7 @@
         </div>
 
         <h1>System Maintenance </h1>
-        <b>CHAT NYOKO KUNG
-            GUSTO NYO MA OPEN ANG USER</b>
+        <b>Please Contact </b>
 
 
         <div class="status-box">
