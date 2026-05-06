@@ -23,7 +23,7 @@ $slaBreached = 0;
 // 1. Kunin ang Rules (Master Template)
 $rulesArr = [];
 $rQ = $conn->query("SELECT * FROM sla_policies WHERE contract_id = 0");
-while($r = $rQ->fetch_assoc()) {
+while ($r = $rQ->fetch_assoc()) {
     $rulesArr[$r['origin_group']][$r['destination_group']] = $r['max_days'];
 }
 
@@ -31,25 +31,25 @@ while($r = $rQ->fetch_assoc()) {
 $query = "SELECT * FROM shipments ORDER BY created_at DESC";
 $result = $conn->query($query);
 
-while($row = $result->fetch_assoc()) {
+while ($row = $result->fetch_assoc()) {
     // BES, TINANGGAL KO NA YUNG 'CONTINUE IF CANCELLED'.
     // Ngayon, bibilangin na niya lahat para mag-match sa Admin Page.
 
     $origin = $row['origin_island'] ?? 'Metro Manila';
     $dest = $row['destination_island'] ?? 'Visayas';
-    $days = $rulesArr[$origin][$dest] ?? 7; 
-    
+    $days = $rulesArr[$origin][$dest] ?? 7;
+
     $created = strtotime($row['created_at']);
     $target = strtotime("+$days days", $created);
     $now = time();
-    
+
     $is_delivered = ($row['status'] == 'Delivered');
-    
+
     // Logic galing admin_shipments.php
     // Kung Cancelled siya, hindi siya delivered, so gagamitin niya ang NOW().
     // Dahil luma na ang date, magiging > Target siya, so bibilangin siyang BREACHED/DELAYED.
     $actual_end = $is_delivered ? strtotime($row['updated_at'] ?? $row['created_at']) : $now;
-    
+
     if ($actual_end > $target) {
         $slaBreached++; // BREACHED / DELAYED
     } else {
@@ -64,12 +64,14 @@ $onTimeRate = ($totalEvaluated > 0) ? round(($slaMet / $totalEvaluated) * 100, 1
 
 
 // C. REVENUE & VOLUME TREND
-$months = []; $revData = []; $volData = [];
+$months = [];
+$revData = [];
+$volData = [];
 for ($i = 5; $i >= 0; $i--) {
     $mStart = date('Y-m-01', strtotime("-$i months"));
     $mEnd = date('Y-m-t', strtotime("-$i months"));
-    $months[] = date('M', strtotime("-$i months")); 
-    
+    $months[] = date('M', strtotime("-$i months"));
+
     $q = "SELECT SUM(price) as rev, COUNT(*) as vol 
           FROM shipments 
           WHERE created_at BETWEEN '$mStart 00:00:00' AND '$mEnd 23:59:59' 
@@ -93,19 +95,22 @@ $locSql = "SELECT destination_island, COUNT(*) as c
            ORDER BY c DESC";
 $locQ = $conn->query($locSql);
 
-$islandStats = []; 
+$islandStats = [];
 
-while($r = $locQ->fetch_assoc()) {
+while ($r = $locQ->fetch_assoc()) {
     $label = $r['destination_island'];
     $count = $r['c'];
     $percent = ($totalVolume > 0) ? round(($count / $totalVolume) * 100, 1) : 0;
-    
-    $color = '#858796'; 
-    if($label == 'Luzon') $color = '#4e73df'; 
-    if($label == 'Visayas') $color = '#f6c23e'; 
-    if($label == 'Mindanao') $color = '#e74a3b'; 
 
-    if($count > 0 && empty($locLabels)) {
+    $color = '#858796';
+    if ($label == 'Luzon')
+        $color = '#4e73df';
+    if ($label == 'Visayas')
+        $color = '#f6c23e';
+    if ($label == 'Mindanao')
+        $color = '#e74a3b';
+
+    if ($count > 0 && empty($locLabels)) {
         $topRegion = $label;
         $topPercent = $percent;
     }
@@ -133,20 +138,21 @@ $statusData = [$statPending, $statTransit, $statDelivered, $statCancelled];
 $cancelLabels = [];
 $cancelCounts = [];
 $cQ = $conn->query("SELECT cancel_reason, COUNT(*) as c FROM shipments WHERE status='Cancelled' AND cancel_reason IS NOT NULL AND cancel_reason != '' GROUP BY cancel_reason ORDER BY c DESC");
-while($row = $cQ->fetch_assoc()){
+while ($row = $cQ->fetch_assoc()) {
     $cancelLabels[] = $row['cancel_reason'];
     $cancelCounts[] = $row['c'];
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Freight Analytics</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freight Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
     <style>
         :root {
@@ -155,7 +161,7 @@ while($row = $cQ->fetch_assoc()){
             --sidebar-width: 260px;
             --primary-color: #222831;
             --primary-hover: #393E46;
-            --secondary-color: #DFD0B8;
+            --secondary-color: #dddad6ff;
             --text-main: #222831;
             --text-secondary: #393E46;
             --border-color: #948979;
@@ -452,7 +458,8 @@ while($row = $cQ->fetch_assoc()){
                         style="width: 320px; max-height: 480px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
                         <li
                             class="p-3 border-bottom fw-bold bg-light d-flex justify-content-between align-items-center">
-                            <span>Notifications</span></li>
+                            <span>Notifications</span>
+                        </li>
                         <div id="notifList">
                             <li class="text-center p-4 text-muted small">Checking...</li>
                         </div>
@@ -478,344 +485,350 @@ while($row = $cQ->fetch_assoc()){
                 </div>
             </div>
         </header>
-<div class="row g-3 mb-4">
-      <div class="col-lg-8">
-        <div class="card h-100">
-          <h5 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow"></i> Revenue & Volume (Last 6 Months)</h5>
-          <div style="height: 300px;">
-            <canvas id="trendChart"></canvas>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="card h-100">
-          <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill"></i> Shipment Status</h5>
-          <div style="height: 300px;">
-            <canvas id="statusChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-3">
-      
-      <div class="col-lg-7">
-        <div class="card h-100">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0"><i class="bi bi-geo-alt-fill text-danger"></i> Top Destinations</h5>
-          </div>
-
-          <div class="row">
-            <div class="col-md-7">
-               <div style="height: 250px;">
-                 <canvas id="locChart"></canvas>
-               </div>
-            </div>
-            
-            <div class="col-md-5 d-flex flex-column justify-content-center">
-                <?php if($topRegion != 'None'): ?>
-                <div class="alert alert-light border-start border-4 border-primary shadow-sm p-2 mb-3">
-                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Dominant Region</small>
-                    <div class="d-flex align-items-center gap-2">
-                        <h5 class="mb-0 fw-bold text-dark"><?php echo $topRegion; ?></h5>
-                        <span class="badge bg-primary rounded-pill"><?php echo $topPercent; ?>% share</span>
+        <div class="row g-3 mb-4">
+            <div class="col-lg-8">
+                <div class="card h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow"></i> Revenue & Volume (Last 6 Months)</h5>
+                    <div style="height: 300px;">
+                        <canvas id="trendChart"></canvas>
                     </div>
                 </div>
-                <?php endif; ?>
-
-                <ul class="list-group list-group-flush small">
-                    <?php if(!empty($islandStats)): foreach($islandStats as $stat): ?>
-                    <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-0 pb-1">
-                        <div class="d-flex align-items-center gap-2" style="width: 50%;">
-                            <span class="rounded-circle" style="width:10px; height:10px; background-color: <?php echo $stat['color']; ?>;"></span>
-                            <span class="fw-semibold"><?php echo $stat['name']; ?></span>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="text-muted"><?php echo $stat['count']; ?> ship</span>
-                            <span class="fw-bold"><?php echo $stat['percent']; ?>%</span>
-                        </div>
-                    </li>
-                    <div class="progress progress-thin mb-2 bg-light">
-                        <div class="progress-bar" style="width: <?php echo $stat['percent']; ?>%; background-color: <?php echo $stat['color']; ?>;"></div>
-                    </div>
-                    <?php endforeach; else: ?>
-                    <div class="text-center text-muted">No data available</div>
-                    <?php endif; ?>
-                </ul>
             </div>
-          </div>
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill"></i> Shipment Status</h5>
+                    <div style="height: 300px;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="col-lg-5">
-        <div class="card h-100">
-          <h5 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> On-Time Performance</h5>
-          <div style="height: 200px;">
-            <canvas id="slaChart"></canvas>
-          </div>
-          <div class="mt-4 text-center">
-             <div class="d-flex justify-content-center gap-4">
-                 <div class="text-center">
-                     <h4 class="mb-0 fw-bold text-success"><?php echo $slaMet; ?></h4>
-                     <small class="text-muted">On Time</small>
-                 </div>
-                 <div class="border-end"></div>
-                 <div class="text-center">
-                     <h4 class="mb-0 fw-bold text-secondary"><?php echo $slaBreached; ?></h4>
-                     <small class="text-muted">Late</small>
-                 </div>
-             </div>
-          </div>
+        <div class="row g-3">
+
+            <div class="col-lg-7">
+                <div class="card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-geo-alt-fill text-danger"></i> Top Destinations</h5>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div style="height: 250px;">
+                                <canvas id="locChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5 d-flex flex-column justify-content-center">
+                            <?php if ($topRegion != 'None'): ?>
+                                <div class="alert alert-light border-start border-4 border-primary shadow-sm p-2 mb-3">
+                                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Dominant
+                                        Region</small>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h5 class="mb-0 fw-bold text-dark"><?php echo $topRegion; ?></h5>
+                                        <span class="badge bg-primary rounded-pill"><?php echo $topPercent; ?>% share</span>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <ul class="list-group list-group-flush small">
+                                <?php if (!empty($islandStats)):
+                                    foreach ($islandStats as $stat): ?>
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between px-0 border-0 pb-1">
+                                            <div class="d-flex align-items-center gap-2" style="width: 50%;">
+                                                <span class="rounded-circle"
+                                                    style="width:10px; height:10px; background-color: <?php echo $stat['color']; ?>;"></span>
+                                                <span class="fw-semibold"><?php echo $stat['name']; ?></span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <span class="text-muted"><?php echo $stat['count']; ?> ship</span>
+                                                <span class="fw-bold"><?php echo $stat['percent']; ?>%</span>
+                                            </div>
+                                        </li>
+                                        <div class="progress progress-thin mb-2 bg-light">
+                                            <div class="progress-bar"
+                                                style="width: <?php echo $stat['percent']; ?>%; background-color: <?php echo $stat['color']; ?>;">
+                                            </div>
+                                        </div>
+                                    <?php endforeach; else: ?>
+                                    <div class="text-center text-muted">No data available</div>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> On-Time Performance</h5>
+                    <div style="height: 200px;">
+                        <canvas id="slaChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <div class="d-flex justify-content-center gap-4">
+                            <div class="text-center">
+                                <h4 class="mb-0 fw-bold text-success"><?php echo $slaMet; ?></h4>
+                                <small class="text-muted">On Time</small>
+                            </div>
+                            <div class="border-end"></div>
+                            <div class="text-center">
+                                <h4 class="mb-0 fw-bold text-secondary"><?php echo $slaBreached; ?></h4>
+                                <small class="text-muted">Late</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
         </div>
-      </div>
-      
-      
 
-  </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            initDarkMode("adminThemeToggle", "adminDarkMode");
+            document.getElementById('hamburger').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('collapsed');
+                document.getElementById('mainContent').classList.toggle('expanded');
+            });
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    initDarkMode("adminThemeToggle", "adminDarkMode");
-    document.getElementById('hamburger').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('collapsed');
-      document.getElementById('mainContent').classList.toggle('expanded');
-    });
+            // DATA INJECTION
+            const months = <?php echo json_encode($months); ?>;
+            const revData = <?php echo json_encode($revData); ?>;
+            const volData = <?php echo json_encode($volData); ?>;
+            const locLabels = <?php echo json_encode($locLabels); ?>;
+            const locData = <?php echo json_encode($locCounts); ?>;
+            const locColors = <?php echo json_encode($locColors); ?>;
+            const statData = <?php echo json_encode($statusData); ?>;
 
-    // DATA INJECTION
-    const months = <?php echo json_encode($months); ?>;
-    const revData = <?php echo json_encode($revData); ?>;
-    const volData = <?php echo json_encode($volData); ?>;
-    const locLabels = <?php echo json_encode($locLabels); ?>;
-    const locData = <?php echo json_encode($locCounts); ?>;
-    const locColors = <?php echo json_encode($locColors); ?>;
-    const statData = <?php echo json_encode($statusData); ?>;
-    
-    // UPDATED SLA DATA FOR PIE CHART
-    const slaData = [<?php echo $slaMet; ?>, <?php echo $slaBreached; ?>];
+            // UPDATED SLA DATA FOR PIE CHART
+            const slaData = [<?php echo $slaMet; ?>, <?php echo $slaBreached; ?>];
 
-    // --- MODERN CHART CONFIG ---
-    Chart.defaults.global.defaultFontFamily = "'Segoe UI', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
-    Chart.defaults.global.defaultFontColor = '#858796';
+            // --- MODERN CHART CONFIG ---
+            Chart.defaults.global.defaultFontFamily = "'Segoe UI', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
+            Chart.defaults.global.defaultFontColor = '#858796';
 
-    const MODERN_COLORS = {
-        primary: '#4e73df',
-        success: '#1cc88a',
-        info: '#36b9cc',
-        warning: '#f6c23e',
-        danger: '#e74a3b',
-        secondary: '#858796',
-        light: '#f8f9fc',
-        dark: '#5a5c69'
-    };
+            const MODERN_COLORS = {
+                primary: '#4e73df',
+                success: '#1cc88a',
+                info: '#36b9cc',
+                warning: '#f6c23e',
+                danger: '#e74a3b',
+                secondary: '#858796',
+                light: '#f8f9fc',
+                dark: '#5a5c69'
+            };
 
-    // Common Options for Clean Look
-    const commonOptions = {
-        maintainAspectRatio: false,
-        layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
-        scales: {
-            xAxes: [{
-                gridLines: { display: false, drawBorder: false },
-                ticks: { maxTicksLimit: 7 }
-            }],
-            yAxes: [{
-                ticks: { maxTicksLimit: 5, padding: 10, callback: function(value) { return value; } },
-                gridLines: { color: "rgb(234, 236, 244)", zeroLineColor: "rgb(234, 236, 244)", drawBorder: false, borderDash: [2], zeroLineBorderDash: [2] }
-            }],
-        },
-        legend: { display: false },
-        tooltips: {
-            backgroundColor: "rgb(255,255,255)",
-            bodyFontColor: "#858796",
-            titleMarginBottom: 10,
-            titleFontColor: '#6e707e',
-            titleFontSize: 14,
-            borderColor: '#dddfeb',
-            borderWidth: 1,
-            xPadding: 15,
-            yPadding: 15,
-            displayColors: false,
-            intersect: false,
-            mode: 'index',
-            caretPadding: 10,
-        }
-    };
-
-    // 1. TREND CHART (Area Style)
-    var ctxTrend = document.getElementById("trendChart").getContext('2d');
-    var gradientRev = ctxTrend.createLinearGradient(0, 0, 0, 400);
-    gradientRev.addColorStop(0, 'rgba(78, 115, 223, 0.5)'); // Primary fade
-    gradientRev.addColorStop(1, 'rgba(78, 115, 223, 0.05)');
-
-    new Chart(ctxTrend, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: "Revenue (₱)",
-                    lineTension: 0.3,
-                    backgroundColor: gradientRev,
-                    borderColor: MODERN_COLORS.primary,
-                    pointRadius: 3,
-                    pointBackgroundColor: MODERN_COLORS.primary,
-                    pointBorderColor: MODERN_COLORS.primary,
-                    pointHoverRadius: 3,
-                    pointHoverBackgroundColor: MODERN_COLORS.primary,
-                    pointHoverBorderColor: MODERN_COLORS.primary,
-                    pointHitRadius: 10,
-                    pointBorderWidth: 2,
-                    data: revData,
-                    yAxisID: 'y-axis-1'
+            // Common Options for Clean Look
+            const commonOptions = {
+                maintainAspectRatio: false,
+                layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
+                scales: {
+                    xAxes: [{
+                        gridLines: { display: false, drawBorder: false },
+                        ticks: { maxTicksLimit: 7 }
+                    }],
+                    yAxes: [{
+                        ticks: { maxTicksLimit: 5, padding: 10, callback: function (value) { return value; } },
+                        gridLines: { color: "rgb(234, 236, 244)", zeroLineColor: "rgb(234, 236, 244)", drawBorder: false, borderDash: [2], zeroLineBorderDash: [2] }
+                    }],
                 },
-                {
-                    label: "Volume",
-                    type: 'bar',
-                    backgroundColor: MODERN_COLORS.info,
-                    hoverBackgroundColor: "#2c9faf",
-                    data: volData,
-                    yAxisID: 'y-axis-2',
-                    barThickness: 20
+                legend: { display: false },
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10,
                 }
-            ]
-        },
-        options: {
-            ...commonOptions,
-            scales: {
-                xAxes: commonOptions.scales.xAxes,
-                yAxes: [
-                    { id: 'y-axis-1', type: 'linear', position: 'left', ticks: { beginAtZero:true, callback: function(value) { return '₱' + value; } }, gridLines: commonOptions.scales.yAxes[0].gridLines },
-                    { id: 'y-axis-2', type: 'linear', position: 'right', ticks: { beginAtZero:true }, gridLines: { display: false } }
-                ]
-            }
-        }
-    });
+            };
 
-    // 2. STATUS CHART (Doughnut)
-    new Chart("statusChart", {
-        type: 'doughnut',
-        data: {
-            labels: ["Pending", "In Transit", "Delivered", "Cancelled"],
-            datasets: [{
-                data: statData,
-                backgroundColor: [MODERN_COLORS.warning, MODERN_COLORS.info, MODERN_COLORS.success, MODERN_COLORS.danger],
-                hoverBackgroundColor: [MODERN_COLORS.warning, MODERN_COLORS.info, MODERN_COLORS.success, MODERN_COLORS.danger],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            tooltips: { ...commonOptions.tooltips, mode: 'nearest' },
-            legend: { display: true, position: 'bottom', labels: { usePointStyle: true } },
-            cutoutPercentage: 75,
-        },
-    });
+            // 1. TREND CHART (Area Style)
+            var ctxTrend = document.getElementById("trendChart").getContext('2d');
+            var gradientRev = ctxTrend.createLinearGradient(0, 0, 0, 400);
+            gradientRev.addColorStop(0, 'rgba(78, 115, 223, 0.5)'); // Primary fade
+            gradientRev.addColorStop(1, 'rgba(78, 115, 223, 0.05)');
 
-    // 3. TOP DESTINATIONS (Horizontal Bar)
-    new Chart("locChart", {
-        type: 'horizontalBar',
-        data: {
-            labels: locLabels,
-            datasets: [{
-                label: "Shipments",
-                backgroundColor: locColors, // Kept dynamic colors
-                hoverBackgroundColor: locColors,
-                borderColor: "#fff",
-                data: locData,
-                barThickness: 20
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
-            scales: {
-                xAxes: [{ ticks: { beginAtZero:true }, gridLines: { display:false, drawBorder:false } }],
-                yAxes: [{ gridLines: { display:false, drawBorder:false }, ticks: { mirror: true, padding: -10, fontColor: '#5a5c69', fontStyle: 'bold' } }] // Mirror labels inside
-            },
-            legend: { display: false },
-            tooltips: commonOptions.tooltips
-        },
-    });
+            new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: "Revenue (₱)",
+                            lineTension: 0.3,
+                            backgroundColor: gradientRev,
+                            borderColor: MODERN_COLORS.primary,
+                            pointRadius: 3,
+                            pointBackgroundColor: MODERN_COLORS.primary,
+                            pointBorderColor: MODERN_COLORS.primary,
+                            pointHoverRadius: 3,
+                            pointHoverBackgroundColor: MODERN_COLORS.primary,
+                            pointHoverBorderColor: MODERN_COLORS.primary,
+                            pointHitRadius: 10,
+                            pointBorderWidth: 2,
+                            data: revData,
+                            yAxisID: 'y-axis-1'
+                        },
+                        {
+                            label: "Volume",
+                            type: 'bar',
+                            backgroundColor: MODERN_COLORS.info,
+                            hoverBackgroundColor: "#2c9faf",
+                            data: volData,
+                            yAxisID: 'y-axis-2',
+                            barThickness: 20
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        xAxes: commonOptions.scales.xAxes,
+                        yAxes: [
+                            { id: 'y-axis-1', type: 'linear', position: 'left', ticks: { beginAtZero: true, callback: function (value) { return '₱' + value; } }, gridLines: commonOptions.scales.yAxes[0].gridLines },
+                            { id: 'y-axis-2', type: 'linear', position: 'right', ticks: { beginAtZero: true }, gridLines: { display: false } }
+                        ]
+                    }
+                }
+            });
 
-    // 4. SLA CHART (Pie)
-    new Chart("slaChart", {
-        type: 'pie',
-        data: {
-            labels: ["On Time", "Late"],
-            datasets: [{
-                data: slaData,
-                backgroundColor: [MODERN_COLORS.success, MODERN_COLORS.danger],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            tooltips: { ...commonOptions.tooltips, mode: 'nearest' },
-            legend: { display: false }, // Custom HTML legend used
-        },
-    });
+            // 2. STATUS CHART (Doughnut)
+            new Chart("statusChart", {
+                type: 'doughnut',
+                data: {
+                    labels: ["Pending", "In Transit", "Delivered", "Cancelled"],
+                    datasets: [{
+                        data: statData,
+                        backgroundColor: [MODERN_COLORS.warning, MODERN_COLORS.info, MODERN_COLORS.success, MODERN_COLORS.danger],
+                        hoverBackgroundColor: [MODERN_COLORS.warning, MODERN_COLORS.info, MODERN_COLORS.success, MODERN_COLORS.danger],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: { ...commonOptions.tooltips, mode: 'nearest' },
+                    legend: { display: true, position: 'bottom', labels: { usePointStyle: true } },
+                    cutoutPercentage: 75,
+                },
+            });
 
-    // 5. CANCELLATION REASON CHART (Gradient Bar)
-    var ctxCancel = document.getElementById("cancelChart").getContext('2d');
-    var gradientCancel = ctxCancel.createLinearGradient(0, 0, 0, 400);
-    gradientCancel.addColorStop(0, '#e74a3b');
-    gradientCancel.addColorStop(1, '#be2617');
+            // 3. TOP DESTINATIONS (Horizontal Bar)
+            new Chart("locChart", {
+                type: 'horizontalBar',
+                data: {
+                    labels: locLabels,
+                    datasets: [{
+                        label: "Shipments",
+                        backgroundColor: locColors, // Kept dynamic colors
+                        hoverBackgroundColor: locColors,
+                        borderColor: "#fff",
+                        data: locData,
+                        barThickness: 20
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
+                    scales: {
+                        xAxes: [{ ticks: { beginAtZero: true }, gridLines: { display: false, drawBorder: false } }],
+                        yAxes: [{ gridLines: { display: false, drawBorder: false }, ticks: { mirror: true, padding: -10, fontColor: '#5a5c69', fontStyle: 'bold' } }] // Mirror labels inside
+                    },
+                    legend: { display: false },
+                    tooltips: commonOptions.tooltips
+                },
+            });
 
-    new Chart(ctxCancel, {
-        type: 'bar',
-        data: {
-            labels: cancelLabels,
-            datasets: [{
-                label: "Cancellations",
-                backgroundColor: gradientCancel,
-                hoverBackgroundColor: "#be2617",
-                borderColor: "#fff",
-                data: cancelCounts,
-                barPercentage: 0.6
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
-            scales: {
-                xAxes: [{ gridLines: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 6 } }],
-                yAxes: [{ ticks: { beginAtZero: true, precision: 0 }, gridLines: commonOptions.scales.yAxes[0].gridLines }]
-            },
-            legend: { display: false },
-            tooltips: commonOptions.tooltips
-        },
-    });
-  </script>
+            // 4. SLA CHART (Pie)
+            new Chart("slaChart", {
+                type: 'pie',
+                data: {
+                    labels: ["On Time", "Late"],
+                    datasets: [{
+                        data: slaData,
+                        backgroundColor: [MODERN_COLORS.success, MODERN_COLORS.danger],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: { ...commonOptions.tooltips, mode: 'nearest' },
+                    legend: { display: false }, // Custom HTML legend used
+                },
+            });
 
-  <script>
-    // --- GLOBAL NOTIFICATION SCRIPT ---
-    function fetchNotifications() {
-        // Siguraduhing tama ang path ng API mo relative sa file location
-        // Kung nasa root folder ka (gaya ng user.php), gamitin ang 'api/get_notifications.php'
-        fetch('api/get_notifications.php')
-        .then(response => response.json())
-        .then(data => {
-            const badge = document.getElementById('notifBadge');
-            const list = document.getElementById('notifList');
+            // 5. CANCELLATION REASON CHART (Gradient Bar)
+            var ctxCancel = document.getElementById("cancelChart").getContext('2d');
+            var gradientCancel = ctxCancel.createLinearGradient(0, 0, 0, 400);
+            gradientCancel.addColorStop(0, '#e74a3b');
+            gradientCancel.addColorStop(1, '#be2617');
 
-            // 1. Update Badge Count
-            if (data.count > 0) {
-                badge.innerText = data.count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
+            new Chart(ctxCancel, {
+                type: 'bar',
+                data: {
+                    labels: cancelLabels,
+                    datasets: [{
+                        label: "Cancellations",
+                        backgroundColor: gradientCancel,
+                        hoverBackgroundColor: "#be2617",
+                        borderColor: "#fff",
+                        data: cancelCounts,
+                        barPercentage: 0.6
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
+                    scales: {
+                        xAxes: [{ gridLines: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 6 } }],
+                        yAxes: [{ ticks: { beginAtZero: true, precision: 0 }, gridLines: commonOptions.scales.yAxes[0].gridLines }]
+                    },
+                    legend: { display: false },
+                    tooltips: commonOptions.tooltips
+                },
+            });
+        </script>
 
-            // 2. Update Dropdown List
-            let html = '';
-            if (data.data.length > 0) {
-                data.data.forEach(notif => {
-                    let bgClass = notif.is_read == 0 ? 'bg-light' : '';
-                    let icon = notif.is_read == 0 ? 'bi-circle-fill text-primary' : 'bi-check-circle text-muted';
-                    
-                    // Adjust link if needed based on user role
-                    let link = notif.link ? notif.link : '#';
+        <script>
+            // --- GLOBAL NOTIFICATION SCRIPT ---
+            function fetchNotifications() {
+                // Siguraduhing tama ang path ng API mo relative sa file location
+                // Kung nasa root folder ka (gaya ng user.php), gamitin ang 'api/get_notifications.php'
+                fetch('api/get_notifications.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('notifBadge');
+                        const list = document.getElementById('notifList');
 
-                    html += `
+                        // 1. Update Badge Count
+                        if (data.count > 0) {
+                            badge.innerText = data.count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+
+                        // 2. Update Dropdown List
+                        let html = '';
+                        if (data.data.length > 0) {
+                            data.data.forEach(notif => {
+                                let bgClass = notif.is_read == 0 ? 'bg-light' : '';
+                                let icon = notif.is_read == 0 ? 'bi-circle-fill text-primary' : 'bi-check-circle text-muted';
+
+                                // Adjust link if needed based on user role
+                                let link = notif.link ? notif.link : '#';
+
+                                html += `
                     <li>
                         <a class="dropdown-item ${bgClass} p-2 border-bottom" href="${link}">
                             <div class="d-flex align-items-start">
@@ -829,28 +842,29 @@ while($row = $cQ->fetch_assoc()){
                             </div>
                         </a>
                     </li>`;
-                });
-            } else {
-                html = '<li class="text-center p-3 text-muted small">No new notifications</li>';
+                            });
+                        } else {
+                            html = '<li class="text-center p-3 text-muted small">No new notifications</li>';
+                        }
+                        list.innerHTML = html;
+                    })
+                    .catch(err => console.error("Notif Error:", err));
             }
-            list.innerHTML = html;
-        })
-        .catch(err => console.error("Notif Error:", err));
-    }
 
-    function markRead() {
-        fetch('api/get_notifications.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=read_all'
-        }).then(() => {
-            document.getElementById('notifBadge').style.display = 'none';
-        });
-    }
+            function markRead() {
+                fetch('api/get_notifications.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=read_all'
+                }).then(() => {
+                    document.getElementById('notifBadge').style.display = 'none';
+                });
+            }
 
-    // Run immediately and every 5 seconds
-    fetchNotifications();
-    setInterval(fetchNotifications, 5000);
-</script>
+            // Run immediately and every 5 seconds
+            fetchNotifications();
+            setInterval(fetchNotifications, 5000);
+        </script>
 </body>
+
 </html>

@@ -2,7 +2,7 @@
 session_start();
 
 if (file_exists(__DIR__ . '/maintenance.flag')) {
-    if (isset($_SESSION['role']) && strtolower(trim($_SESSION['role'])) === 'user') {
+    if (isset($_SESSION['role']) && (strtolower(trim($_SESSION['role'])) === 'user' || strtolower(trim($_SESSION['role'])) === 'admin')) {
         $currentScript = basename($_SERVER['PHP_SELF']);
         if ($currentScript !== 'maintenance.php' && $currentScript !== 'logout.php') {
             header("Location: maintenance.php");
@@ -14,10 +14,12 @@ if (file_exists(__DIR__ . '/maintenance.flag')) {
 
 // if (!isset($_SESSION['username'])) {
 //     header("Location: login.php");
-//     exit;
+//     exit; 
+
 // }
 
-function normalizeRoleName($role) {
+function normalizeRoleName($role)
+{
     $role = strtolower(trim((string) $role));
     $role = str_replace('_', ' ', $role);
     $role = preg_replace('/\s+/', ' ', $role);
@@ -25,7 +27,8 @@ function normalizeRoleName($role) {
 }
 
 // Require user to be logged in
-function requireLogin() {
+function requireLogin()
+{
     if (!isset($_SESSION['user_id'])) {
         header("Location: login.php");
         exit();
@@ -33,7 +36,8 @@ function requireLogin() {
 }
 
 // Require a specific role
-function requireRole($role) {
+function requireRole($role)
+{
     if (
         !isset($_SESSION['user_id']) ||
         !isset($_SESSION['role']) ||
@@ -45,7 +49,8 @@ function requireRole($role) {
 }
 
 // Optional: allow multiple roles
-function requireRoles(array $roles) {
+function requireRoles(array $roles)
+{
     if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
         header("Location: login.php");
         exit();

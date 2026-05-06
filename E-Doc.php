@@ -213,7 +213,7 @@ if ($is_unlocked) {
             --sidebar-width: 260px;
             --primary-color: #222831;
             --primary-hover: #393E46;
-            --secondary-color: #DFD0B8;
+            --secondary-color: #dddad6ff;
             --text-main: #222831;
             --text-secondary: #393E46;
             --border-color: #948979;

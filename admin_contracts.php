@@ -30,7 +30,7 @@ $contractsQ = mysqli_query($conn, "SELECT c.*, a.email, a.username, a.profile_im
     <style>
     :root {
       --bs-primary: #222831; --bs-primary-rgb: 34, 40, 49; --sidebar-width: 260px;
-      --primary-color: #222831; --primary-hover: #393E46; --secondary-color: #DFD0B8;
+      --primary-color: #222831; --primary-hover: #393E46; --secondary-color: #dddad6ff;
       --text-main: #222831; --text-secondary: #393E46; --border-color: #948979;
       --dark-bg: #1c2027; --dark-card: #222831; --dark-border: #393E46;
       --dark-text-main: #DFD0B8; --dark-text-sec: #948979;

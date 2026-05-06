@@ -90,7 +90,7 @@ if ($is_unlocked) {
             --sidebar-width: 260px;
             --primary-color: #222831;
             --primary-hover: #393E46;
-            --secondary-color: #DFD0B8;
+            --secondary-color: #dddad6ff;
             --text-main: #222831;
             --text-secondary: #393E46;
             --border-color: #948979;
@@ -387,7 +387,8 @@ if ($is_unlocked) {
                         style="width: 320px; max-height: 480px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
                         <li
                             class="p-3 border-bottom fw-bold bg-light d-flex justify-content-between align-items-center">
-                            <span>Notifications</span></li>
+                            <span>Notifications</span>
+                        </li>
                         <div id="notifList">
                             <li class="text-center p-4 text-muted small">Checking...</li>
                         </div>

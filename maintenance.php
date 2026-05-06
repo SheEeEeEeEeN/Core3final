@@ -19,7 +19,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--primary-bg) 0%, #020617 100%);
+            background-color: #dddad6ff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -259,8 +259,9 @@
         </div>
 
         <h1>System Maintenance </h1>
-        <p>Core Transaction 3 is currently undergoing scheduled infrastructure upgrades. This enterprise maintenance
-            ensures optimal performance, security, and reliability for all logistics operations.</p>
+        <b>CHAT NYOKO KUNG
+            GUSTO NYO MA OPEN ANG USER</b>
+
 
         <div class="status-box">
             <div class="status-item">
@@ -281,8 +282,7 @@
         </div>
 
         <div class="action-buttons">
-            <a href="#" class="btn-custom"
-                onclick="alert('Support portal is currently limited during maintenance. Please email support@freightcore.com for urgent inquiries.'); return false;">
+            <a href="#" class="btn-custom" onclick="alert('message -> Roy Valle'); return false;">
                 <i class="bi bi-headset"></i> Contact IT Support
             </a>
             <a href="logout.php" class="btn-custom btn-danger-custom">
