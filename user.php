@@ -394,7 +394,7 @@ $statusDistributionValues = array_values($statusDistribution);
             color: var(--text-main);
             z-index: 1040;
             transition: all 0.3s ease;
-            border-right: 1px solid var(--border-color);
+            /* border-right: 1px solid var(--border-color); */
             display: flex;
             flex-direction: column;
         }
@@ -467,7 +467,8 @@ $statusDistributionValues = array_values($statusDistribution);
 
         /* Cards & UI */
         .card {
-            border: 1px solid var(--border-color);
+
+            /* border: 1px solid var(--border-color); */
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
             background: white;
@@ -480,7 +481,7 @@ $statusDistributionValues = array_values($statusDistribution);
 
         .card-header {
             background: white;
-            border-bottom: 1px solid var(--border-color);
+            /* border-bottom: 1px solid var(--border-color); */
             border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
             padding: 1rem 1.25rem;
         }
@@ -647,7 +648,7 @@ $statusDistributionValues = array_values($statusDistribution);
         }
 
         body.dark-mode .form-control:focus {
-            border-color: var(--primary-color) !important;
+            /* border-color: var(--primary-color) !important; */
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
         }
 
