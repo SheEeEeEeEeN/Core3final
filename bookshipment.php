@@ -33,42 +33,42 @@ if ($input && $_SERVER['REQUEST_METHOD'] === 'POST') {
       $contractRaw = "CN-" . date("Y") . "-" . strtoupper(substr(md5(uniqid(rand(), true)), 0, 5));
     }
 
-    $contract    = mysqli_real_escape_string($conn, $contractRaw);
-    $sender      = mysqli_real_escape_string($conn, $input['sender_name']);
-    $s_contact   = mysqli_real_escape_string($conn, $input['sender_contact']);
-    $receiver    = mysqli_real_escape_string($conn, $input['receiver_name']);
-    $r_contact   = mysqli_real_escape_string($conn, $input['receiver_contact']);
-    $origin      = mysqli_real_escape_string($conn, $input['origin_address']);
-    $dest        = mysqli_real_escape_string($conn, $input['destination_address']);
+    $contract = mysqli_real_escape_string($conn, $contractRaw);
+    $sender = mysqli_real_escape_string($conn, $input['sender_name']);
+    $s_contact = mysqli_real_escape_string($conn, $input['sender_contact']);
+    $receiver = mysqli_real_escape_string($conn, $input['receiver_name']);
+    $r_contact = mysqli_real_escape_string($conn, $input['receiver_contact']);
+    $origin = mysqli_real_escape_string($conn, $input['origin_address']);
+    $dest = mysqli_real_escape_string($conn, $input['destination_address']);
     $origin_island = mysqli_real_escape_string($conn, $input['origin_island'] ?? 'Luzon');
-    $dest_island   = mysqli_real_escape_string($conn, $input['destination_island'] ?? 'Luzon');
-    $address     = mysqli_real_escape_string($conn, $input['address']);
-    $weight      = floatval($input['weight']);
-    $type        = mysqli_real_escape_string($conn, $input['package_type']);
-    $desc        = mysqli_real_escape_string($conn, $input['package']);
-    $method      = mysqli_real_escape_string($conn, $input['payment_method']);
-    $bank        = mysqli_real_escape_string($conn, $input['bank_name']);
-    $km          = floatval($input['distance_km']);
-    $price       = floatval($input['price_php']);
-    $ai_time     = mysqli_real_escape_string($conn, $input['ai_estimated_time'] ?? 'Calculating...');
+    $dest_island = mysqli_real_escape_string($conn, $input['destination_island'] ?? 'Luzon');
+    $address = mysqli_real_escape_string($conn, $input['address']);
+    $weight = floatval($input['weight']);
+    $type = mysqli_real_escape_string($conn, $input['package_type']);
+    $desc = mysqli_real_escape_string($conn, $input['package']);
+    $method = mysqli_real_escape_string($conn, $input['payment_method']);
+    $bank = mysqli_real_escape_string($conn, $input['bank_name']);
+    $km = floatval($input['distance_km']);
+    $price = floatval($input['price_php']);
+    $ai_time = mysqli_real_escape_string($conn, $input['ai_estimated_time'] ?? 'Calculating...');
     $target_date = !empty($input['target_date']) ? $input['target_date'] : date('Y-m-d', strtotime('+3 days'));
 
     // Coordinates
     $origin_lat = !empty($input['origin_lat']) ? mysqli_real_escape_string($conn, $input['origin_lat']) : null;
     $origin_lng = !empty($input['origin_lng']) ? mysqli_real_escape_string($conn, $input['origin_lng']) : null;
-    $dest_lat   = !empty($input['dest_lat']) ? mysqli_real_escape_string($conn, $input['dest_lat']) : null;
-    $dest_lng   = !empty($input['dest_lng']) ? mysqli_real_escape_string($conn, $input['dest_lng']) : null;
+    $dest_lat = !empty($input['dest_lat']) ? mysqli_real_escape_string($conn, $input['dest_lat']) : null;
+    $dest_lng = !empty($input['dest_lng']) ? mysqli_real_escape_string($conn, $input['dest_lng']) : null;
 
     // --- AUTO-SAVE CONTRACT FOR E-DOCS ---
     // If the contract number (generated or passed) doesn't exist in 'contracts' table yet, save it.
     // This allows it to appear in E-Doc.php and be printable via contract_print.php.
     $checkC = mysqli_query($conn, "SELECT id FROM contracts WHERE contract_number='$contract'");
     if (mysqli_num_rows($checkC) == 0) {
-        // It's a new generated contract (One-Time)
-        // We set status='One-Time' so it's not reused as a permanent contract, but exists for records.
-        $c_sql = "INSERT INTO contracts (contract_number, user_id, client_name, status, start_date, end_date, created_at) 
+      // It's a new generated contract (One-Time)
+      // We set status='One-Time' so it's not reused as a permanent contract, but exists for records.
+      $c_sql = "INSERT INTO contracts (contract_number, user_id, client_name, status, start_date, end_date, created_at) 
                   VALUES ('$contract', '$userId', '$sender', 'One-Time', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), NOW())";
-        mysqli_query($conn, $c_sql);
+      mysqli_query($conn, $c_sql);
     }
     // -------------------------------------
 
@@ -209,7 +209,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       --sidebar-width: 260px;
       --primary-color: #222831;
       --primary-hover: #393E46;
-      --secondary-color: #DFD0B8;
+      --secondary-color: #dddad6ff;
       --accent-color: #393E46;
       --text-main: #222831;
       --text-secondary: #393E46;
@@ -245,89 +245,89 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
 
     /* --- SIDEBAR --- */
     .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        top: 0;
-        background: #ffffff;
-        color: var(--text-main);
-        z-index: 1040;
-        transition: all 0.3s ease;
-        border-right: 1px solid var(--border-color);
-        display: flex;
-        flex-direction: column;
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: #ffffff;
+      color: var(--text-main);
+      z-index: 1040;
+      transition: all 0.3s ease;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
     }
 
     .content {
-        margin-left: var(--sidebar-width);
-        padding: 24px;
-        transition: all 0.3s ease;
-        min-height: 100vh;
+      margin-left: var(--sidebar-width);
+      padding: 24px;
+      transition: all 0.3s ease;
+      min-height: 100vh;
     }
 
     .sidebar.collapsed {
-        margin-left: calc(var(--sidebar-width) * -1);
+      margin-left: calc(var(--sidebar-width) * -1);
     }
 
     .content.expanded {
-        margin-left: 0;
+      margin-left: 0;
     }
 
     @media (max-width: 768px) {
-        .sidebar {
-            margin-left: calc(var(--sidebar-width) * -1);
-        }
+      .sidebar {
+        margin-left: calc(var(--sidebar-width) * -1);
+      }
 
-        .sidebar.show {
-            margin-left: 0;
-        }
+      .sidebar.show {
+        margin-left: 0;
+      }
 
-        .content {
-            margin-left: 0;
-        }
+      .content {
+        margin-left: 0;
+      }
 
-        .content.expanded {
-            margin-left: 0;
-        }
+      .content.expanded {
+        margin-left: 0;
+      }
 
-        .content.mobile-expanded {
-            margin-left: var(--sidebar-width);
-        }
+      .content.mobile-expanded {
+        margin-left: var(--sidebar-width);
+      }
     }
 
     /* Navigation Links */
     .nav-link {
-        font-weight: 500;
-        color: var(--text-secondary) !important;
-        transition: all 0.2s ease;
-        margin-bottom: 4px;
-        border-radius: var(--radius-md);
-        padding: 10px 16px;
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
+      font-weight: 500;
+      color: var(--text-secondary) !important;
+      transition: all 0.2s ease;
+      margin-bottom: 4px;
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
     }
 
     .nav-link:hover {
-        color: var(--text-main) !important;
-        background: var(--secondary-color);
+      color: var(--text-main) !important;
+      background: var(--secondary-color);
     }
 
     .nav-link.active {
-        color: #ffffff !important;
-        background: var(--primary-color);
-        font-weight: 600;
+      color: #ffffff !important;
+      background: var(--primary-color);
+      font-weight: 600;
     }
 
     .nav-link i {
-        font-size: 1.1rem;
-        margin-right: 12px;
+      font-size: 1.1rem;
+      margin-right: 12px;
     }
 
     /* Logo Fixes */
     body:not(.dark-mode) .sidebar img[alt="Freight Logo"] {
-        filter: brightness(0);
+      filter: brightness(0);
     }
 
     /* --- CARDS & PANELS --- */
@@ -447,23 +447,23 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     }
 
     body.dark-mode .sidebar {
-        background: var(--dark-card);
-        border-right: 1px solid var(--dark-border);
-        color: var(--dark-text-main);
+      background: var(--dark-card);
+      border-right: 1px solid var(--dark-border);
+      color: var(--dark-text-main);
     }
 
     body.dark-mode .nav-link {
-        color: var(--dark-text-sec) !important;
+      color: var(--dark-text-sec) !important;
     }
 
     body.dark-mode .nav-link:hover {
-        color: var(--dark-text-main) !important;
-        background: var(--dark-border);
+      color: var(--dark-text-main) !important;
+      background: var(--dark-border);
     }
 
     body.dark-mode .nav-link.active {
-        color: var(--dark-bg) !important;
-        background: var(--border-color);
+      color: var(--dark-bg) !important;
+      background: var(--border-color);
     }
 
     /* Components */
@@ -573,88 +573,89 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     <div class="text-center mb-4 mt-2">
       <img src="Remorig.png" alt="Freight Logo" class="img-fluid mb-2" style="max-width: 120px; transition: 0.3s ease;">
       <h6 class="fw-semibold text-uppercase text-muted mb-0 logo-title"
-          style="letter-spacing: 1px; font-size: 0.75rem;">Core Transaction 3</h6>
+        style="letter-spacing: 1px; font-size: 0.75rem;">Core Transaction 3</h6>
     </div>
     <hr class="border-secondary opacity-25">
     <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            <a href="user.php" class="nav-link"><i class="bi bi-grid-1x2"></i> <span class="sidebar-text">Dashboard</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="bookshipment.php" class="nav-link active"><i class="bi bi-box-seam"></i> <span class="sidebar-text">Book Shipment</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="My_shipment.php" class="nav-link"><i class="bi bi-truck"></i> <span class="sidebar-text">My Shipments</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="shiphistory.php" class="nav-link"><i class="bi bi-clock-history"></i> <span class="sidebar-text">History</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="feedback.php" class="nav-link"><i class="bi bi-chat-square-text"></i> <span class="sidebar-text">Feedback</span></a>
-        </li>
+      <li class="nav-item">
+        <a href="user.php" class="nav-link"><i class="bi bi-grid-1x2"></i> <span
+            class="sidebar-text">Dashboard</span></a>
+      </li>
+      <li class="nav-item">
+        <a href="bookshipment.php" class="nav-link active"><i class="bi bi-box-seam"></i> <span
+            class="sidebar-text">Book Shipment</span></a>
+      </li>
+      <li class="nav-item">
+        <a href="My_shipment.php" class="nav-link"><i class="bi bi-truck"></i> <span class="sidebar-text">My
+            Shipments</span></a>
+      </li>
+      <li class="nav-item">
+        <a href="shiphistory.php" class="nav-link"><i class="bi bi-clock-history"></i> <span
+            class="sidebar-text">History</span></a>
+      </li>
+      <li class="nav-item">
+        <a href="feedback.php" class="nav-link"><i class="bi bi-chat-square-text"></i> <span
+            class="sidebar-text">Feedback</span></a>
+      </li>
     </ul>
   </div>
 
   <div class="content" id="mainContent">
-    <header class="top-header d-flex align-items-center justify-content-between sticky-top mb-4 p-3 bg-white shadow-sm rounded-3">
-        <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-light border-0 p-2" id="hamburger"><i
-                    class="bi bi-list fs-4"></i></button>
-            <div>
-                <h5 class="fw-bold mb-0">Book Shipment</h5>
-            </div>
+    <header
+      class="top-header d-flex align-items-center justify-content-between sticky-top mb-4 p-3 bg-white shadow-sm rounded-3">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light border-0 p-2" id="hamburger"><i class="bi bi-list fs-4"></i></button>
+        <div>
+          <h5 class="fw-bold mb-0">Book Shipment</h5>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch mb-0 ps-0 d-flex align-items-center gap-2">
+          <label class="form-check-label text-muted" for="userThemeToggle"><i class="bi bi-moon-stars"></i></label>
+          <input class="form-check-input m-0" type="checkbox" role="switch" id="userThemeToggle">
         </div>
 
-        <div class="d-flex align-items-center gap-3">
-            <div class="form-check form-switch mb-0 ps-0 d-flex align-items-center gap-2">
-                <label class="form-check-label text-muted" for="userThemeToggle"><i
-                        class="bi bi-moon-stars"></i></label>
-                <input class="form-check-input m-0" type="checkbox" role="switch" id="userThemeToggle">
+        <div class="dropdown mx-1">
+          <a href="#" class="text-dark position-relative" id="notifDropdown" data-bs-toggle="dropdown"
+            onclick="markRead()">
+            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
+              style="width:36px;height:36px;">
+              <i class="bi bi-bell"></i>
             </div>
-
-            <div class="dropdown mx-1">
-                <a href="#" class="text-dark position-relative" id="notifDropdown" data-bs-toggle="dropdown"
-                    onclick="markRead()">
-                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width:36px;height:36px;">
-                        <i class="bi bi-bell"></i>
-                    </div>
-                    <span
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-white"
-                        id="notifBadge" style="display: none; padding: 0.25em 0.5em; font-size: 0.65em;">0</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow p-0"
-                    style="width: 320px; max-height: 480px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
-                    <li
-                        class="p-3 border-bottom fw-bold bg-light d-flex justify-content-between align-items-center">
-                        <span>Notifications</span>
-                        <small class="text-primary cursor-pointer text-decoration-none" style="cursor:pointer;"
-                            onclick="location.href='feedback.php'">View All</small>
-                    </li>
-                    <div id="notifList">
-                        <li class="text-center p-4 text-muted small">No new notifications</li>
-                    </div>
-                </ul>
+            <span
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-white"
+              id="notifBadge" style="display: none; padding: 0.25em 0.5em; font-size: 0.65em;">0</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow p-0"
+            style="width: 320px; max-height: 480px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+            <li class="p-3 border-bottom fw-bold bg-light d-flex justify-content-between align-items-center">
+              <span>Notifications</span>
+              <small class="text-primary cursor-pointer text-decoration-none" style="cursor:pointer;"
+                onclick="location.href='feedback.php'">View All</small>
+            </li>
+            <div id="notifList">
+              <li class="text-center p-4 text-muted small">No new notifications</li>
             </div>
-
-            <div class="dropdown">
-                <a href="#" data-bs-toggle="dropdown" class="d-block link-dark text-decoration-none"
-                    style="cursor: pointer;">
-                    <img src="<?php echo $profileImage ?? 'default-avatar.png'; ?>" alt="mdo" width="36" height="36"
-                        class="rounded-circle object-fit-cover border border-2 border-primary">
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end text-small shadow"
-                    style="border: 1px solid var(--border-color); border-radius: var(--radius-md);">
-                    <li><a class="dropdown-item" href="user-profile.php"><i
-                                class="bi bi-person me-2"></i>Profile</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item text-danger" href="logout.php"><i
-                                class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                </ul>
-            </div>
+          </ul>
         </div>
+
+        <div class="dropdown">
+          <a href="#" data-bs-toggle="dropdown" class="d-block link-dark text-decoration-none" style="cursor: pointer;">
+            <img src="<?php echo $profileImage ?? 'default-avatar.png'; ?>" alt="mdo" width="36" height="36"
+              class="rounded-circle object-fit-cover border border-2 border-primary">
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end text-small shadow"
+            style="border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+            <li><a class="dropdown-item" href="user-profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item text-danger" href="logout.php"><i
+                  class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
     </header>
 
     <div class="container-fluid p-0">
@@ -662,7 +663,8 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
         <div class="col-lg-8">
           <div class="panel">
             <h4 class="mb-2">Route Search & Navigation</h4>
-            <p class="text-muted small">Select origin and destination locations. The map will calculate a drivable route.</p>
+            <p class="text-muted small">Select origin and destination locations. The map will calculate a drivable
+              route.</p>
 
             <div class="location-selectors">
               <div class="location-group p-3 border rounded bg-light-subtle">
@@ -739,13 +741,16 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
 
             <div class="row mt-3 g-2">
               <div class="col-4">
-                <div class="form-control p-2 text-center bg-light"><small class="text-muted d-block">Distance</small><strong id="distanceKmDisplay">0.000</strong> km</div>
+                <div class="form-control p-2 text-center bg-light"><small
+                    class="text-muted d-block">Distance</small><strong id="distanceKmDisplay">0.000</strong> km</div>
               </div>
               <div class="col-4">
-                <div class="form-control p-2 text-center bg-light"><small class="text-muted d-block">Rate/km</small><strong id="ratePerKmDisplay">--</strong></div>
+                <div class="form-control p-2 text-center bg-light"><small
+                    class="text-muted d-block">Rate/km</small><strong id="ratePerKmDisplay">--</strong></div>
               </div>
               <div class="col-4">
-                <div class="form-control p-2 text-center bg-light"><small class="text-muted d-block">Price</small><strong id="priceDisplay">₱0.00</strong></div>
+                <div class="form-control p-2 text-center bg-light"><small
+                    class="text-muted d-block">Price</small><strong id="priceDisplay">₱0.00</strong></div>
               </div>
             </div>
           </div>
@@ -771,7 +776,8 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
                 </div>
                 <div class="input-group input-group-sm mt-2">
                   <input type="text" class="form-control fw-bold" name="contract_number" id="contractNumber" readonly>
-                  <a href="#" id="viewContractBtn" target="_blank" class="btn btn-outline-primary" type="button" title="View Full Contract">
+                  <a href="#" id="viewContractBtn" target="_blank" class="btn btn-outline-primary" type="button"
+                    title="View Full Contract">
                     <i class="bi bi-eye"></i> View
                   </a>
                 </div>
@@ -787,11 +793,13 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
               <div class="row g-2 mb-2">
                 <div class="col-7">
                   <label class="form-label small">Sender Name</label>
-                  <input type="text" class="form-control fw-bold" name="sender_name" required readonly value="<?php echo htmlspecialchars($username); ?>">
+                  <input type="text" class="form-control fw-bold" name="sender_name" required readonly
+                    value="<?php echo htmlspecialchars($username); ?>">
                 </div>
                 <div class="col-5">
                   <label class="form-label small">Sender Contact</label>
-                  <input type="text" class="form-control" name="sender_contact" placeholder="09xxxxxxxxx" value="<?php echo htmlspecialchars($userContact); ?>" required>
+                  <input type="text" class="form-control" name="sender_contact" placeholder="09xxxxxxxxx"
+                    value="<?php echo htmlspecialchars($userContact); ?>" required>
                 </div>
               </div>
 
@@ -808,11 +816,13 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
 
               <div class="mb-2">
                 <label class="form-label small">Origin Address (Auto)</label>
-                <input type="text" class="form-control bg-light" name="origin_address" id="originField" readonly required>
+                <input type="text" class="form-control bg-light" name="origin_address" id="originField" readonly
+                  required>
               </div>
               <div class="mb-2">
                 <label class="form-label small">Destination Address (Auto)</label>
-                <input type="text" class="form-control bg-light" name="destination_address" id="destinationField" readonly required>
+                <input type="text" class="form-control bg-light" name="destination_address" id="destinationField"
+                  readonly required>
               </div>
 
               <div class="mb-2">
@@ -823,7 +833,8 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
               <div class="row g-2 mb-2">
                 <div class="col-6">
                   <label class="form-label small">Actual Weight (kg)</label>
-                  <input type="number" step="0.01" class="form-control" name="weight" id="actualWeight" required placeholder="0.0">
+                  <input type="number" step="0.01" class="form-control" name="weight" id="actualWeight" required
+                    placeholder="0.0">
                 </div>
                 <div class="col-6">
                   <label class="form-label small">Package Type</label>
@@ -916,7 +927,8 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
               <div class="mb-3 form-check">
                 <input type="checkbox" id="contractAgree" disabled class="form-check-input">
                 <label for="contractAgree" class="form-check-label small">
-                  I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#contractModal">Terms & Conditions</a>
+                  I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#contractModal">Terms &
+                    Conditions</a>
                 </label>
               </div>
 
@@ -925,7 +937,8 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
               <input type="hidden" name="price_php" id="price_php" value="0">
 
               <div class="d-grid gap-2">
-                <button type="button" id="calcBtn" class="btn btn-success" onclick="calculateTotal()">Calculate Price</button>
+                <button type="button" id="calcBtn" class="btn btn-success" onclick="calculateTotal()">Calculate
+                  Price</button>
                 <button type="submit" class="btn btn-primary" id="submitBtn">🚀 Submit Booking</button>
               </div>
             </form>
@@ -971,14 +984,17 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
-            <div class="border p-4 rounded bg-light shadow-sm" style="max-height: 400px; overflow-y: auto; font-size: 0.85rem; line-height: 1.6; color: #333;">
+            <div class="border p-4 rounded bg-light shadow-sm"
+              style="max-height: 400px; overflow-y: auto; font-size: 0.85rem; line-height: 1.6; color: #333;">
 
               <div class="text-center mb-4">
                 <h5 class="fw-bold mb-1">STANDARD TRADING CONDITIONS</h5>
               </div>
 
               <h6 class="fw-bold text-primary mt-3">1. DEFINITIONS</h6>
-              <p class="mb-2">"Carrier" refers to Slate Freight and its authorized logistics partners (Core 2 Providers). "Shipper" refers to the person booking the shipment. "Consignee" refers to the receiver of the goods.</p>
+              <p class="mb-2">"Carrier" refers to Slate Freight and its authorized logistics partners (Core 2
+                Providers). "Shipper" refers to the person booking the shipment. "Consignee" refers to the receiver of
+                the goods.</p>
 
               <h6 class="fw-bold text-primary mt-3">2. PROHIBITED ITEMS</h6>
               <p class="mb-1">The Shipper warrants that the package does NOT contain any of the following:</p>
@@ -989,33 +1005,44 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
                 <li>Cash, jewelry, and high-value negotiable instruments</li>
                 <li>Firearms and ammunition</li>
               </ul>
-              <p class="fst-italic text-danger small">The Carrier reserves the right to inspect and refuse packages suspected of containing prohibited items.</p>
+              <p class="fst-italic text-danger small">The Carrier reserves the right to inspect and refuse packages
+                suspected of containing prohibited items.</p>
 
               <h6 class="fw-bold text-primary mt-3">3. SHIPPER'S RESPONSIBILITY (PACKAGING)</h6>
-              <p class="mb-2">The Shipper is solely responsible for proper packaging. Items must be packed in a way that withstands the rigors of transportation. The Carrier is <strong>NOT liable</strong> for damage caused by improper or insufficient packaging (e.g., glass without bubble wrap).</p>
+              <p class="mb-2">The Shipper is solely responsible for proper packaging. Items must be packed in a way that
+                withstands the rigors of transportation. The Carrier is <strong>NOT liable</strong> for damage caused by
+                improper or insufficient packaging (e.g., glass without bubble wrap).</p>
 
               <h6 class="fw-bold text-primary mt-3">4. LIMITATION OF LIABILITY</h6>
-              <p class="mb-1">Unless the Shipper declares a higher value and pays the corresponding valuation charge (Insurance), the Carrier's liability for loss or damage is limited to:</p>
+              <p class="mb-1">Unless the Shipper declares a higher value and pays the corresponding valuation charge
+                (Insurance), the Carrier's liability for loss or damage is limited to:</p>
               <ul class="mb-2 ps-3">
                 <li>The actual value of the item; or</li>
                 <li><strong>PHP 2,000.00</strong> (Philippine Peso);</li>
               </ul>
-              <p class="mb-2">Whichever is lower. The Carrier is not liable for indirect or consequential damages (e.g., lost profits due to delay).</p>
+              <p class="mb-2">Whichever is lower. The Carrier is not liable for indirect or consequential damages (e.g.,
+                lost profits due to delay).</p>
 
               <h6 class="fw-bold text-primary mt-3">5. DELIVERY TIMEFRAME & DELAYS</h6>
-              <p class="mb-2">Delivery dates provided by the AI Prediction are <strong>estimates only</strong> and are not guaranteed. The Carrier is not liable for delays caused by traffic congestion, checkpoint delays, or incorrect addresses provided by the Shipper.</p>
+              <p class="mb-2">Delivery dates provided by the AI Prediction are <strong>estimates only</strong> and are
+                not guaranteed. The Carrier is not liable for delays caused by traffic congestion, checkpoint delays, or
+                incorrect addresses provided by the Shipper.</p>
 
               <h6 class="fw-bold text-primary mt-3">6. FORCE MAJEURE</h6>
-              <p class="mb-2">The Carrier shall not be liable for loss, damage, or delay arising from acts of God (typhoons, floods, earthquakes), strikes, civil commotion, or government acts.</p>
+              <p class="mb-2">The Carrier shall not be liable for loss, damage, or delay arising from acts of God
+                (typhoons, floods, earthquakes), strikes, civil commotion, or government acts.</p>
 
               <h6 class="fw-bold text-primary mt-3">7. CLAIMS</h6>
-              <p class="mb-0">Any claim for damage or loss must be filed within <strong>twenty-four (24) hours</strong> from the time of delivery. Failure to report within this period shall be deemed a waiver of the claim.</p>
+              <p class="mb-0">Any claim for damage or loss must be filed within <strong>twenty-four (24) hours</strong>
+                from the time of delivery. Failure to report within this period shall be deemed a waiver of the claim.
+              </p>
             </div>
 
             <div class="mt-3 text-end">
               <div class="form-check d-inline-block text-start">
                 <input class="form-check-input" type="checkbox" id="readConfirm">
-                <label class="form-check-label small text-muted" for="readConfirm">I have read and understood the Terms and Conditions.</label>
+                <label class="form-check-label small text-muted" for="readConfirm">I have read and understood the Terms
+                  and Conditions.</label>
               </div>
             </div>
           </div>
@@ -1043,17 +1070,25 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
             <div class="tab-content">
               <div class="tab-pane fade show active" id="ewallet">
                 <div class="d-grid gap-2 mb-3">
-                  <button type="button" class="btn btn-outline-primary py-2 d-flex align-items-center justify-content-between" onclick="selectEwallet('GCash')"><span>GCash</span> <i class="bi bi-phone"></i></button>
-                  <button type="button" class="btn btn-outline-dark py-2 d-flex align-items-center justify-content-between" onclick="selectEwallet('Maya')"><span>Maya</span> <i class="bi bi-wallet2"></i></button>
+                  <button type="button"
+                    class="btn btn-outline-primary py-2 d-flex align-items-center justify-content-between"
+                    onclick="selectEwallet('GCash')"><span>GCash</span> <i class="bi bi-phone"></i></button>
+                  <button type="button"
+                    class="btn btn-outline-dark py-2 d-flex align-items-center justify-content-between"
+                    onclick="selectEwallet('Maya')"><span>Maya</span> <i class="bi bi-wallet2"></i></button>
                 </div>
                 <div id="ewalletForm" class="d-none">
-                  <div class="mb-2"><label class="small fw-bold">Mobile</label><input type="number" class="form-control" placeholder="09xxxxxxxxx"></div>
-                  <div class="d-grid"><button class="btn btn-primary" onclick="simulateProcessing('E-Wallet')">Pay Now</button></div>
+                  <div class="mb-2"><label class="small fw-bold">Mobile</label><input type="number" class="form-control"
+                      placeholder="09xxxxxxxxx"></div>
+                  <div class="d-grid"><button class="btn btn-primary" onclick="simulateProcessing('E-Wallet')">Pay
+                      Now</button></div>
                 </div>
               </div>
               <div class="tab-pane fade" id="card">
-                <div class="mb-2"><label class="small fw-bold">Card Number</label><input type="text" class="form-control" placeholder="0000 0000 0000 0000"></div>
-                <div class="d-grid"><button class="btn btn-primary" onclick="simulateProcessing('Credit Card')">Pay Now</button></div>
+                <div class="mb-2"><label class="small fw-bold">Card Number</label><input type="text"
+                    class="form-control" placeholder="0000 0000 0000 0000"></div>
+                <div class="d-grid"><button class="btn btn-primary" onclick="simulateProcessing('Credit Card')">Pay
+                    Now</button></div>
               </div>
             </div>
             <div id="paymentProcessing" class="text-center py-4 d-none">
@@ -1072,18 +1107,25 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header bg-info text-white">
-            <h5 class="modal-title">Confirm Booking</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <h5 class="modal-title">Confirm Booking</h5><button type="button" class="btn-close btn-close-white"
+              data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between"><span>Method</span> <strong id="previewPaymentMethod"></strong></li>
-              <li class="list-group-item d-flex justify-content-between"><span>Contract</span> <strong id="previewContractNumber"></strong></li>
-              <li class="list-group-item"><strong>Sender:</strong> <span id="previewSenderName"></span> (<span id="previewSenderContact"></span>)</li>
-              <li class="list-group-item"><strong>Receiver:</strong> <span id="previewReceiverName"></span> (<span id="previewReceiverContact"></span>)</li>
+              <li class="list-group-item d-flex justify-content-between"><span>Method</span> <strong
+                  id="previewPaymentMethod"></strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span>Contract</span> <strong
+                  id="previewContractNumber"></strong></li>
+              <li class="list-group-item"><strong>Sender:</strong> <span id="previewSenderName"></span> (<span
+                  id="previewSenderContact"></span>)</li>
+              <li class="list-group-item"><strong>Receiver:</strong> <span id="previewReceiverName"></span> (<span
+                  id="previewReceiverContact"></span>)</li>
               <li class="list-group-item"><strong>Origin:</strong> <span id="previewOrigin"></span></li>
               <li class="list-group-item"><strong>Dest:</strong> <span id="previewDestination"></span></li>
-              <li class="list-group-item d-flex justify-content-between bg-light"><span>Total Price</span> <strong class="text-success" id="previewPrice"></strong></li>
-              <li class="list-group-item"><strong>AI ETA:</strong> <span id="previewAiTime" class="small fw-bold text-info"></span></li>
+              <li class="list-group-item d-flex justify-content-between bg-light"><span>Total Price</span> <strong
+                  class="text-success" id="previewPrice"></strong></li>
+              <li class="list-group-item"><strong>AI ETA:</strong> <span id="previewAiTime"
+                  class="small fw-bold text-info"></span></li>
             </ul>
           </div>
           <div class="modal-footer">
@@ -1108,15 +1150,15 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     if (typeof initDarkMode === "function") initDarkMode("userThemeToggle", "userDarkMode");
 
     document.getElementById('hamburger').addEventListener('click', () => {
-        const sidebar = document.getElementById('sidebar');
-        const content = document.getElementById('mainContent');
-        if (window.innerWidth > 768) { 
-            sidebar.classList.toggle('collapsed'); 
-            content.classList.toggle('expanded'); 
-        } else {
-            sidebar.classList.toggle('show');
-            content.classList.toggle('mobile-expanded');
-        }
+      const sidebar = document.getElementById('sidebar');
+      const content = document.getElementById('mainContent');
+      if (window.innerWidth > 768) {
+        sidebar.classList.toggle('collapsed');
+        content.classList.toggle('expanded');
+      } else {
+        sidebar.classList.toggle('show');
+        content.classList.toggle('mobile-expanded');
+      }
     });
 
     // 2. LOCATION HIERARCHY LOGIC
@@ -1176,40 +1218,40 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     }
 
     // Origin Listeners
-    document.getElementById('originIsland').addEventListener('change', function() {
+    document.getElementById('originIsland').addEventListener('change', function () {
       document.getElementById('hiddenOriginIsland').value = this.value;
       updateRegionDropdown(this.value, 'originRegion');
       resetDropdowns(['originProvince', 'originMunicipality', 'originBarangay']);
       checkSLA();
     });
-    document.getElementById('originRegion').addEventListener('change', function() {
+    document.getElementById('originRegion').addEventListener('change', function () {
       loadProvinces(this, 'originProvince');
       resetDropdowns(['originMunicipality', 'originBarangay']);
     });
-    document.getElementById('originProvince').addEventListener('change', function() {
+    document.getElementById('originProvince').addEventListener('change', function () {
       loadMunicipalities(this, 'originMunicipality', 'originRegion');
       resetDropdowns(['originBarangay']);
     });
-    document.getElementById('originMunicipality').addEventListener('change', function() {
+    document.getElementById('originMunicipality').addEventListener('change', function () {
       loadBarangays(this, 'originBarangay', 'originRegion', 'originProvince');
     });
 
     // Destination Listeners
-    document.getElementById('destIsland').addEventListener('change', function() {
+    document.getElementById('destIsland').addEventListener('change', function () {
       document.getElementById('hiddenDestIsland').value = this.value;
       updateRegionDropdown(this.value, 'destRegion');
       resetDropdowns(['destProvince', 'destMunicipality', 'destBarangay']);
       checkSLA();
     });
-    document.getElementById('destRegion').addEventListener('change', function() {
+    document.getElementById('destRegion').addEventListener('change', function () {
       loadProvinces(this, 'destProvince');
       resetDropdowns(['destMunicipality', 'destBarangay']);
     });
-    document.getElementById('destProvince').addEventListener('change', function() {
+    document.getElementById('destProvince').addEventListener('change', function () {
       loadMunicipalities(this, 'destMunicipality', 'destRegion');
       resetDropdowns(['destBarangay']);
     });
-    document.getElementById('destMunicipality').addEventListener('change', function() {
+    document.getElementById('destMunicipality').addEventListener('change', function () {
       loadBarangays(this, 'destBarangay', 'destRegion', 'destProvince');
     });
 
@@ -1241,7 +1283,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
           weight: 6
         }]
       },
-      createMarker: function(i, wp, n) {
+      createMarker: function (i, wp, n) {
         let iconHtml = (i === 0) ? greenPinHtml : ((i === n - 1) ? redPinHtml : null);
         if (iconHtml) {
           return L.marker(wp.latLng, {
@@ -1260,7 +1302,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     }).addTo(map);
 
     // EVENT: Route Found
-    routingControl.on('routesfound', function(e) {
+    routingControl.on('routesfound', function (e) {
       const routes = e.routes;
       if (routes && routes.length > 0) {
         const km = routes[0].summary.totalDistance / 1000.0;
@@ -1288,7 +1330,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       }
     });
 
-    routingControl.on('routingerror', function(e) {
+    routingControl.on('routingerror', function (e) {
       console.error('Routing Error:', e);
       Swal.fire({
         icon: 'error',
@@ -1370,44 +1412,44 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
 
     // Constants from Basis (PHP)
     const BASE_RATES = {
-        land: { per_km: 8.50, per_kg: 2.75, base_fee: 150.00 },
-        sea: { per_km: 3.25, per_kg: 1.50, base_fee: 500.00 },
-        air: { per_km: 15.75, per_kg: 8.25, base_fee: 800.00 }
+      land: { per_km: 8.50, per_kg: 2.75, base_fee: 150.00 },
+      sea: { per_km: 3.25, per_kg: 1.50, base_fee: 500.00 },
+      air: { per_km: 15.75, per_kg: 8.25, base_fee: 800.00 }
     };
 
     const DELIVERY_ADJUSTMENTS = {
-        motorcycle: 0.9,
-        bike: 1.0,
-        truck: 1.2,
-        auto: 1.0
+      motorcycle: 0.9,
+      bike: 1.0,
+      truck: 1.2,
+      auto: 1.0
     };
 
     const CARGO_MULTIPLIERS = {
-        general: 1.0,
-        perishable: 1.3,
-        hazardous: 2.1,
-        fragile: 1.5,
-        oversized: 1.8,
-        documents: 1.25
+      general: 1.0,
+      perishable: 1.3,
+      hazardous: 2.1,
+      fragile: 1.5,
+      oversized: 1.8,
+      documents: 1.25
     };
 
     // Mapping UI Package Types to Basis Cargo Types
     const PACKAGE_TYPE_MAP = {
-        'parcel': 'documents',      // Small Parcel -> Documents (closest fit)
-        'box': 'general',           // Standard Box -> General
-        'crate': 'general',         // Large Crate -> General
-        'furniture': 'oversized',   // Furniture -> Oversized
-        'pallet': 'oversized'       // Pallet -> Oversized
+      'parcel': 'documents',      // Small Parcel -> Documents (closest fit)
+      'box': 'general',           // Standard Box -> General
+      'crate': 'general',         // Large Crate -> General
+      'furniture': 'oversized',   // Furniture -> Oversized
+      'pallet': 'oversized'       // Pallet -> Oversized
     };
 
     const SERVICE_MULTIPLIERS = {
-        standard: 1.0,
-        express: 1.6,
-        economy: 0.8
+      standard: 1.0,
+      express: 1.6,
+      economy: 0.8
     };
 
     const TARIFFS = {
-        ph_boc: { land: 0.15, sea: 0.12, air: 0.18 }
+      ph_boc: { land: 0.15, sea: 0.12, air: 0.18 }
     };
 
     function calculateTotal() {
@@ -1429,11 +1471,11 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
 
       // 2. DETERMINE PARAMETERS
       // Defaulting to 'land' as Leaflet Routing Machine generates driving routes
-      const carrierType = 'land'; 
+      const carrierType = 'land';
       const deliveryType = 'truck'; // Standard for this booking type
       const serviceLevel = 'standard';
       const tariffSource = 'ph_boc';
-      
+
       // Determine Cargo Type
       const cargoType = PACKAGE_TYPE_MAP[uiPackageType] || 'general';
 
@@ -1442,23 +1484,23 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       const deliveryMult = DELIVERY_ADJUSTMENTS[deliveryType] || 1.0;
       const cargoMult = CARGO_MULTIPLIERS[cargoType] || 1.0;
       const serviceMult = SERVICE_MULTIPLIERS[serviceLevel] || 1.0;
-      
+
       const tariffRates = TARIFFS[tariffSource];
       const tariffRate = tariffRates[carrierType] || 0.15;
 
       // 4. PERFORM CALCULATION (Matching PHP Formula)
-      
+
       // Base Rate Calculation
       const distanceRate = distKm * baseRate.per_km;
       const weightRate = chargeableW * baseRate.per_kg;
       const calculatedBase = Math.max(baseRate.base_fee, distanceRate + weightRate);
-      
+
       // Apply Multipliers
       const finalBaseRate = calculatedBase * cargoMult * serviceMult * deliveryMult;
-      
+
       // Apply Tariff
       const tariffAmount = finalBaseRate * tariffRate;
-      
+
       // Final Total
       const totalRatePHP = finalBaseRate + tariffAmount;
 
@@ -1474,16 +1516,16 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       // Update Info Displays
       const rateDisplay = document.getElementById('ratePerKmDisplay');
       if (rateDisplay) {
-         rateDisplay.innerHTML = '₱' + baseRate.per_km.toFixed(2);
-         rateDisplay.style.color = '#0d6efd';
+        rateDisplay.innerHTML = '₱' + baseRate.per_km.toFixed(2);
+        rateDisplay.style.color = '#0d6efd';
       }
 
       // Update Description/SLA Text for clarity
       const slaText = document.getElementById('slaPromiseText');
       if (slaText) {
-          slaText.innerHTML = 
-            `<i class="bi bi-truck text-primary"></i> <strong>Standard Land Freight</strong><br>
-             <small class="text-muted">Base: ₱${baseRate.base_fee} | Rate: ₱${baseRate.per_km}/km | Tariff: ${tariffRate*100}%</small>`;
+        slaText.innerHTML =
+          `<i class="bi bi-truck text-primary"></i> <strong>Standard Land Freight</strong><br>
+             <small class="text-muted">Base: ₱${baseRate.base_fee} | Rate: ₱${baseRate.per_km}/km | Tariff: ${tariffRate * 100}%</small>`;
       }
     }
 
@@ -1494,7 +1536,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     });
 
     // Auto-Fill Helper
-    document.getElementById('itemHelper').addEventListener('change', function() {
+    document.getElementById('itemHelper').addEventListener('change', function () {
       const selected = this.options[this.selectedIndex];
       if (selected.value !== "") {
         document.getElementById('dimL').value = selected.getAttribute('data-l');
@@ -1540,7 +1582,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
         } else {
           timeDisplay.textContent = "Est. " + (distanceKm / 40).toFixed(1) + " hrs";
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     function selectPayment(method, element) {
@@ -1570,7 +1612,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       }, 2000);
     }
 
-    document.getElementById("shipmentForm").addEventListener("submit", function(e) {
+    document.getElementById("shipmentForm").addEventListener("submit", function (e) {
       e.preventDefault();
       const method = document.getElementById('selectedPaymentMethod').value;
       if (!method) {
@@ -1631,7 +1673,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
       new bootstrap.Modal(document.getElementById("inputPreviewModal")).show();
     }
 
-    document.getElementById("finalConfirmBtn").addEventListener("click", async function(e) { // <--- Lagyan mo ng 'e'
+    document.getElementById("finalConfirmBtn").addEventListener("click", async function (e) { // <--- Lagyan mo ng 'e'
       e.preventDefault(); // <--- Idagdag mo ito para hindi mag-refresh ang page!
 
       console.log("📢 PININDOT MO AKO! (Start of Process)"); // <--- Sound Check
@@ -1701,12 +1743,12 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
             allowOutsideClick: false,
             showCloseButton: true
           }).then(() => {
-             // Optional: reload page or reset form
-             // window.location.reload();
+            // Optional: reload page or reset form
+            // window.location.reload();
           });
 
         } else {
-           Swal.fire({
+          Swal.fire({
             icon: 'error',
             title: 'Booking Failed',
             text: result.error,
@@ -1733,7 +1775,7 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     });
 
     // Prevent View Contract click if no contract generated
-    document.getElementById("viewContractBtn").addEventListener("click", function(e) {
+    document.getElementById("viewContractBtn").addEventListener("click", function (e) {
       const href = this.getAttribute('href');
       if (!href || href === '#' || href === 'javascript:void(0)') {
         e.preventDefault();
@@ -1775,51 +1817,51 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
     // }
 
     function checkSLA() {
-    const origin = document.getElementById('originIsland').value;
-    const dest = document.getElementById('destIsland').value;
-    
-    // If locations aren't selected yet, don't run the fetch
-    if (!origin || !dest) return;
+      const origin = document.getElementById('originIsland').value;
+      const dest = document.getElementById('destIsland').value;
 
-    const fd = new FormData();
-    fd.append('origin_island', origin);
-    fd.append('dest_island', dest);
+      // If locations aren't selected yet, don't run the fetch
+      if (!origin || !dest) return;
 
-    fetch('get_contract_logic.php', {
+      const fd = new FormData();
+      fd.append('origin_island', origin);
+      fd.append('dest_island', dest);
+
+      fetch('get_contract_logic.php', {
         method: 'POST',
         body: fd
-    })
-    .then(res => res.json())
-    .then(data => {
-        // 1. Update the hidden input / display field
-        const contractNum = data.contract_number;
-        document.getElementById('contractNumber').value = contractNum;
+      })
+        .then(res => res.json())
+        .then(data => {
+          // 1. Update the hidden input / display field
+          const contractNum = data.contract_number;
+          document.getElementById('contractNumber').value = contractNum;
 
-        // 2. DYNAMICALLY UPDATE THE VIEW LINK
-        // This adds ?number=CONTRACT_NUMBER to the URL so contract_print.php can find it
-        const viewBtn = document.getElementById('viewContractBtn');
-        if (viewBtn) {
+          // 2. DYNAMICALLY UPDATE THE VIEW LINK
+          // This adds ?number=CONTRACT_NUMBER to the URL so contract_print.php can find it
+          const viewBtn = document.getElementById('viewContractBtn');
+          if (viewBtn) {
             viewBtn.href = "contract_print.php?number=" + encodeURIComponent(contractNum);
-        }
+          }
 
-        // 3. Update SLA and Target Dates
-        document.getElementById('slaMaxDays').value = data.sla_days;
-        document.getElementById('targetDeliveryDate').value = data.target_date;
+          // 3. Update SLA and Target Dates
+          document.getElementById('slaMaxDays').value = data.sla_days;
+          document.getElementById('targetDeliveryDate').value = data.target_date;
 
-        // 4. Update the UI Badge
-        const badge = document.getElementById('contractStatusBadge');
-        if (data.is_contracted) {
+          // 4. Update the UI Badge
+          const badge = document.getElementById('contractStatusBadge');
+          if (data.is_contracted) {
             badge.className = "badge bg-primary";
             badge.innerText = "Contract Active";
-        } else {
+          } else {
             badge.className = "badge bg-secondary";
             badge.innerText = "No Contract (Standard Rate)";
-        }
-    })
-    .catch(err => {
-        console.error("SLA Fetch Error:", err);
-    });
-}
+          }
+        })
+        .catch(err => {
+          console.error("SLA Fetch Error:", err);
+        });
+    }
 
     function fetchNotifications() {
       fetch('api/get_notifications.php').then(r => r.json()).then(data => {
@@ -1846,12 +1888,12 @@ $userContact = isset($user['contact_number']) ? $user['contact_number'] : '';
 
     function markRead() {
       fetch('api/get_notifications.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'action=read_all'
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=read_all'
+      })
         .then(() => document.getElementById('notifBadge').style.display = 'none');
     }
 

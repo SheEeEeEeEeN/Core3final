@@ -11,7 +11,8 @@ if (session_status() === PHP_SESSION_NONE) {
 // =================================================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'get_shipment_details') {
 
-    while (ob_get_level()) ob_end_clean();
+    while (ob_get_level())
+        ob_end_clean();
     header('Content-Type: application/json');
 
     $shipmentId = intval($_POST['id']);
@@ -159,7 +160,7 @@ include('loading.html');
             --sidebar-width: 260px;
             --primary-color: #222831;
             --primary-hover: #393E46;
-            --secondary-color: #DFD0B8;
+            --secondary-color: #dddad6ff;
             --text-main: #222831;
             --text-secondary: #393E46;
             --border-color: #948979;
@@ -177,28 +178,98 @@ include('loading.html');
             --radius-lg: 12px;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--secondary-color); color: var(--text-main); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-
-        /* SIDEBAR */
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: #ffffff; color: var(--text-main); z-index: 1040; transition: all 0.3s ease; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .content { margin-left: var(--sidebar-width); padding: 24px; transition: all 0.3s ease; min-height: 100vh; }
-        .sidebar.collapsed { margin-left: calc(var(--sidebar-width) * -1); }
-        .content.expanded { margin-left: 0; }
-
-        @media (max-width: 768px) {
-            .sidebar { margin-left: calc(var(--sidebar-width) * -1); }
-            .sidebar.show { margin-left: 0; }
-            .content { margin-left: 0; }
-            .content.expanded { margin-left: 0; }
-            .content.mobile-expanded { margin-left: var(--sidebar-width); }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .nav-link { font-weight: 500; color: var(--text-secondary) !important; transition: all 0.2s ease; margin-bottom: 4px; border-radius: var(--radius-md); padding: 10px 16px; display: flex; align-items: center; white-space: nowrap; }
-        .nav-link:hover { color: var(--text-main) !important; background: var(--secondary-color); }
-        .nav-link.active { color: #ffffff !important; background: var(--primary-color); font-weight: 600; }
-        .nav-link i { font-size: 1.1rem; margin-right: 12px; }
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #ffffff;
+            color: var(--text-main);
+            z-index: 1040;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
 
-        body:not(.dark-mode) .sidebar img[alt="Logo"] { filter: brightness(0); }
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .sidebar.collapsed {
+            margin-left: calc(var(--sidebar-width) * -1);
+        }
+
+        .content.expanded {
+            margin-left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: calc(var(--sidebar-width) * -1);
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .content.expanded {
+                margin-left: 0;
+            }
+
+            .content.mobile-expanded {
+                margin-left: var(--sidebar-width);
+            }
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-secondary) !important;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--text-main) !important;
+            background: var(--secondary-color);
+        }
+
+        .nav-link.active {
+            color: #ffffff !important;
+            background: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+            margin-right: 12px;
+        }
+
+        body:not(.dark-mode) .sidebar img[alt="Logo"] {
+            filter: brightness(0);
+        }
 
         /* Timeline CSS */
         .timeline-shell {
@@ -305,22 +376,56 @@ include('loading.html');
         }
 
         /* Dark Mode Overrides */
-        body.dark-mode { background-color: var(--dark-bg); color: var(--dark-text-main); --bs-card-bg: var(--dark-card); --bs-body-bg: var(--dark-bg); --bs-border-color: var(--dark-border); --bs-body-color: var(--dark-text-main); }
-        body.dark-mode .sidebar { background: var(--dark-card); border-right: 1px solid var(--dark-border); color: var(--dark-text-main); }
-        body.dark-mode .top-header { background-color: var(--dark-card) !important; color: var(--dark-text-main) !important; border: 1px solid var(--dark-border); }
-        body.dark-mode .card { background-color: var(--dark-card) !important; color: var(--dark-text-main) !important; border: 1px solid var(--dark-border) !important; }
-        body.dark-mode .text-muted { color: var(--dark-text-sec) !important; }
-        body.dark-mode .modal-content { background-color: var(--dark-card); color: var(--dark-text-main); border: 1px solid var(--dark-border); }
-        body.dark-mode .btn-close { filter: invert(1); }
-        
-        body.dark-mode table,
-        body.dark-mode tbody tr, 
-        body.dark-mode td, 
-        body.dark-mode th { 
-            background-color: var(--dark-card) !important; 
-            color: var(--dark-text-main) !important; 
-            border-color: var(--dark-border) !important; 
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text-main);
+            --bs-card-bg: var(--dark-card);
+            --bs-body-bg: var(--dark-bg);
+            --bs-border-color: var(--dark-border);
+            --bs-body-color: var(--dark-text-main);
         }
+
+        body.dark-mode .sidebar {
+            background: var(--dark-card);
+            border-right: 1px solid var(--dark-border);
+            color: var(--dark-text-main);
+        }
+
+        body.dark-mode .top-header {
+            background-color: var(--dark-card) !important;
+            color: var(--dark-text-main) !important;
+            border: 1px solid var(--dark-border);
+        }
+
+        body.dark-mode .card {
+            background-color: var(--dark-card) !important;
+            color: var(--dark-text-main) !important;
+            border: 1px solid var(--dark-border) !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: var(--dark-text-sec) !important;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: var(--dark-card);
+            color: var(--dark-text-main);
+            border: 1px solid var(--dark-border);
+        }
+
+        body.dark-mode .btn-close {
+            filter: invert(1);
+        }
+
+        body.dark-mode table,
+        body.dark-mode tbody tr,
+        body.dark-mode td,
+        body.dark-mode th {
+            background-color: var(--dark-card) !important;
+            color: var(--dark-text-main) !important;
+            border-color: var(--dark-border) !important;
+        }
+
         body.dark-mode .table {
             --bs-table-bg: var(--dark-card);
             --bs-table-color: var(--dark-text-main);
@@ -328,28 +433,61 @@ include('loading.html');
             --bs-table-hover-bg: var(--dark-bg);
             --bs-table-hover-color: var(--dark-text-main);
         }
+
         body.dark-mode .table-primary th {
             background-color: var(--dark-bg) !important;
             color: var(--dark-text-main) !important;
             border-bottom: 2px solid var(--dark-border) !important;
         }
-        body.dark-mode td.text-primary { color: #87b0ff !important; }
-        body.dark-mode table tbody tr:hover td { background-color: var(--dark-bg) !important; }
 
-        body.dark-mode .form-control, body.dark-mode .form-select { background-color: var(--dark-bg); color: white; border-color: var(--dark-border); }
-        body.dark-mode .bg-light { background-color: var(--dark-bg) !important; color: white; border-color: var(--dark-border) !important; }
+        body.dark-mode td.text-primary {
+            color: #87b0ff !important;
+        }
+
+        body.dark-mode table tbody tr:hover td {
+            background-color: var(--dark-bg) !important;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: var(--dark-bg);
+            color: white;
+            border-color: var(--dark-border);
+        }
+
+        body.dark-mode .bg-light {
+            background-color: var(--dark-bg) !important;
+            color: white;
+            border-color: var(--dark-border) !important;
+        }
 
         body.dark-mode .timeline-shell {
             background: linear-gradient(165deg, #020617 0%, #0f172a 55%, #111827 100%);
             border-color: rgba(71, 85, 105, 0.42);
         }
-        
-        body.dark-mode .nav-link { color: var(--dark-text-sec) !important; }
-        body.dark-mode .nav-link:hover { color: var(--dark-text-main) !important; background: var(--dark-border); }
-        body.dark-mode .nav-link.active { color: var(--dark-bg) !important; background: var(--border-color); }
-        
-        .clickable-row { cursor: pointer; transition: background-color 0.2s; }
-        .clickable-row:hover { background-color: var(--secondary-color) !important; }
+
+        body.dark-mode .nav-link {
+            color: var(--dark-text-sec) !important;
+        }
+
+        body.dark-mode .nav-link:hover {
+            color: var(--dark-text-main) !important;
+            background: var(--dark-border);
+        }
+
+        body.dark-mode .nav-link.active {
+            color: var(--dark-bg) !important;
+            background: var(--border-color);
+        }
+
+        .clickable-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .clickable-row:hover {
+            background-color: var(--secondary-color) !important;
+        }
     </style>
 </head>
 
@@ -363,28 +501,33 @@ include('loading.html');
         <hr class="border-secondary opacity-25">
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="user.php" class="nav-link"><i class="bi bi-grid-1x2"></i> <span class="sidebar-text">Dashboard</span></a>
+                <a href="user.php" class="nav-link"><i class="bi bi-grid-1x2"></i> <span
+                        class="sidebar-text">Dashboard</span></a>
             </li>
             <li class="nav-item">
-                <a href="bookshipment.php" class="nav-link"><i class="bi bi-box-seam"></i> <span class="sidebar-text">Book Shipment</span></a>
+                <a href="bookshipment.php" class="nav-link"><i class="bi bi-box-seam"></i> <span
+                        class="sidebar-text">Book Shipment</span></a>
             </li>
             <li class="nav-item">
-                <a href="My_shipment.php" class="nav-link"><i class="bi bi-truck"></i> <span class="sidebar-text">My Shipments</span></a>
+                <a href="My_shipment.php" class="nav-link"><i class="bi bi-truck"></i> <span class="sidebar-text">My
+                        Shipments</span></a>
             </li>
             <li class="nav-item">
-                <a href="shiphistory.php" class="nav-link active"><i class="bi bi-clock-history"></i> <span class="sidebar-text">History</span></a>
+                <a href="shiphistory.php" class="nav-link active"><i class="bi bi-clock-history"></i> <span
+                        class="sidebar-text">History</span></a>
             </li>
             <li class="nav-item">
-                <a href="feedback.php" class="nav-link"><i class="bi bi-chat-square-text"></i> <span class="sidebar-text">Feedback</span></a>
+                <a href="feedback.php" class="nav-link"><i class="bi bi-chat-square-text"></i> <span
+                        class="sidebar-text">Feedback</span></a>
             </li>
         </ul>
     </div>
 
     <div class="content" id="mainContent">
-        <header class="top-header d-flex align-items-center justify-content-between sticky-top mb-4 p-3 bg-white shadow-sm rounded-3">
+        <header
+            class="top-header d-flex align-items-center justify-content-between sticky-top mb-4 p-3 bg-white shadow-sm rounded-3">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light border-0 p-2" id="hamburger"><i
-                        class="bi bi-list fs-4"></i></button>
+                <button class="btn btn-light border-0 p-2" id="hamburger"><i class="bi bi-list fs-4"></i></button>
                 <div>
                     <h5 class="fw-bold mb-0">Shipment History</h5>
                 </div>
@@ -448,34 +591,44 @@ include('loading.html');
                     <form method="get" class="row g-3 align-items-end">
                         <div class="col-lg-3">
                             <label class="form-label small text-uppercase text-muted fw-semibold">Search</label>
-                            <input type="text" name="q" class="form-control" value="<?php echo htmlspecialchars($searchTerm); ?>" placeholder="Tracking, receiver, destination">
+                            <input type="text" name="q" class="form-control"
+                                value="<?php echo htmlspecialchars($searchTerm); ?>"
+                                placeholder="Tracking, receiver, destination">
                         </div>
                         <div class="col-lg-3">
                             <label class="form-label small text-uppercase text-muted fw-semibold">Status</label>
                             <select name="status" class="form-select">
                                 <option value="">All Status</option>
-                                <option value="Pending" <?php echo $statusFilter === 'Pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="Pending" <?php echo $statusFilter === 'Pending' ? 'selected' : ''; ?>>
+                                    Pending</option>
                                 <option value="In Transit" <?php echo $statusFilter === 'In Transit' ? 'selected' : ''; ?>>In Transit</option>
-                                <option value="Delivered" <?php echo $statusFilter === 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
-                                <option value="Cancelled" <?php echo $statusFilter === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
-                                <option value="Archived" <?php echo $statusFilter === 'Archived' ? 'selected' : ''; ?>>Archived</option>
+                                <option value="Delivered" <?php echo $statusFilter === 'Delivered' ? 'selected' : ''; ?>>
+                                    Delivered</option>
+                                <option value="Cancelled" <?php echo $statusFilter === 'Cancelled' ? 'selected' : ''; ?>>
+                                    Cancelled</option>
+                                <option value="Archived" <?php echo $statusFilter === 'Archived' ? 'selected' : ''; ?>>
+                                    Archived</option>
                             </select>
                         </div>
                         <div class="col-lg-3">
                             <label class="form-label small text-uppercase text-muted fw-semibold">Booked Month</label>
-                            <input type="month" name="month" class="form-control" value="<?php echo htmlspecialchars($historyMonth); ?>">
+                            <input type="month" name="month" class="form-control"
+                                value="<?php echo htmlspecialchars($historyMonth); ?>">
                         </div>
                         <div class="col-lg-3">
                             <div class="d-flex gap-2 justify-content-lg-end">
-                                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Apply</button>
-                                <a href="<?php echo htmlspecialchars($csvExportUrl); ?>" class="btn btn-outline-success">
+                                <button type="submit" class="btn btn-primary"><i
+                                        class="bi bi-funnel me-1"></i>Apply</button>
+                                <a href="<?php echo htmlspecialchars($csvExportUrl); ?>"
+                                    class="btn btn-outline-success">
                                     <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export CSV
                                 </a>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-between align-items-center pt-2 border-top">
                             <h5 class="fw-bold mb-0">Shipment Records</h5>
-                            <small class="text-muted">Showing records for <?php echo htmlspecialchars($selectedMonthLabel); ?></small>
+                            <small class="text-muted">Showing records for
+                                <?php echo htmlspecialchars($selectedMonthLabel); ?></small>
                         </div>
                     </form>
                 </div>
@@ -506,12 +659,17 @@ include('loading.html');
                                         ?>
                                         <tr class="clickable-row" onclick="openShipmentModal(<?php echo $row['id']; ?>)">
                                             <td class="fw-bold text-primary"><?php echo htmlspecialchars($trackingNo); ?></td>
-                                            <td><?php echo htmlspecialchars(strlen($displayAddress) > 38 ? substr($displayAddress, 0, 38) . '...' : $displayAddress); ?></td>
+                                            <td><?php echo htmlspecialchars(strlen($displayAddress) > 38 ? substr($displayAddress, 0, 38) . '...' : $displayAddress); ?>
+                                            </td>
                                             <td><?php echo htmlspecialchars((string) $row['weight']); ?></td>
                                             <td><?php echo number_format((float) $row['price'], 2); ?></td>
-                                            <td><?php echo htmlspecialchars(strtoupper((string) $row['payment_method'])); ?></td>
-                                            <td><span class="badge <?php echo $statusMeta['badge']; ?>"><?php echo htmlspecialchars($statusMeta['label']); ?></span></td>
-                                            <td><?php echo !empty($row[$shipmentDateColumn]) ? date("M d, Y", strtotime($row[$shipmentDateColumn])) : 'N/A'; ?></td>
+                                            <td><?php echo htmlspecialchars(strtoupper((string) $row['payment_method'])); ?>
+                                            </td>
+                                            <td><span
+                                                    class="badge <?php echo $statusMeta['badge']; ?>"><?php echo htmlspecialchars($statusMeta['label']); ?></span>
+                                            </td>
+                                            <td><?php echo !empty($row[$shipmentDateColumn]) ? date("M d, Y", strtotime($row[$shipmentDateColumn])) : 'N/A'; ?>
+                                            </td>
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else: ?>
@@ -543,26 +701,33 @@ include('loading.html');
                     <div class="row g-4">
                         <div class="col-lg-5">
                             <div class="card border bg-light shadow-sm mb-3">
-                                <div class="card-header bg-white fw-bold text-secondary"><i class="bi bi-geo-alt me-1"></i> Route Information</div>
+                                <div class="card-header bg-white fw-bold text-secondary"><i
+                                        class="bi bi-geo-alt me-1"></i> Route Information</div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <small class="text-uppercase text-muted fw-bold" style="font-size:0.7rem;">From (Sender)</small>
+                                        <small class="text-uppercase text-muted fw-bold" style="font-size:0.7rem;">From
+                                            (Sender)</small>
                                         <div class="fw-bold fs-5" id="modalSender"></div>
                                         <div class="text-primary small mb-1">
                                             <i class="bi bi-telephone-fill me-1"></i>
-                                            <a href="#" id="modalSenderContactLink" class="text-decoration-none fw-bold"></a>
+                                            <a href="#" id="modalSenderContactLink"
+                                                class="text-decoration-none fw-bold"></a>
                                         </div>
-                                        <div class="p-2 bg-white border rounded small text-secondary" id="modalOrigin"></div>
+                                        <div class="p-2 bg-white border rounded small text-secondary" id="modalOrigin">
+                                        </div>
                                     </div>
                                     <div class="text-center my-1"><i class="bi bi-arrow-down text-muted"></i></div>
                                     <div>
-                                        <small class="text-uppercase text-muted fw-bold" style="font-size:0.7rem;">To (Receiver)</small>
+                                        <small class="text-uppercase text-muted fw-bold" style="font-size:0.7rem;">To
+                                            (Receiver)</small>
                                         <div class="fw-bold fs-5" id="modalReceiver"></div>
                                         <div class="text-primary small mb-1">
                                             <i class="bi bi-telephone-fill me-1"></i>
-                                            <a href="#" id="modalReceiverContactLink" class="text-decoration-none fw-bold"></a>
+                                            <a href="#" id="modalReceiverContactLink"
+                                                class="text-decoration-none fw-bold"></a>
                                         </div>
-                                        <div class="p-2 bg-white border rounded small text-secondary" id="modalDestination"></div>
+                                        <div class="p-2 bg-white border rounded small text-secondary"
+                                            id="modalDestination"></div>
                                     </div>
                                     <div class="mt-3">
                                         <small class="text-muted fw-bold">Notes:</small>
@@ -572,7 +737,8 @@ include('loading.html');
                             </div>
 
                             <div class="card mb-3 border shadow-sm">
-                                <div class="card-header bg-white fw-bold text-secondary"><i class="bi bi-box me-1"></i> Package Info</div>
+                                <div class="card-header bg-white fw-bold text-secondary"><i class="bi bi-box me-1"></i>
+                                    Package Info</div>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between mb-2 border-bottom pb-2">
                                         <span class="text-muted small">Type</span>
@@ -590,7 +756,8 @@ include('loading.html');
                             </div>
 
                             <div class="card border shadow-sm">
-                                <div class="card-header bg-white fw-bold text-secondary"><i class="bi bi-wallet2 me-1"></i> Payment Details</div>
+                                <div class="card-header bg-white fw-bold text-secondary"><i
+                                        class="bi bi-wallet2 me-1"></i> Payment Details</div>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="text-muted small">Method</span>
@@ -610,32 +777,39 @@ include('loading.html');
                             <div class="timeline-shell h-100">
                                 <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
                                     <div>
-                                        <span class="timeline-badge"><i class="fa-solid fa-satellite-dish"></i> Live Tracking Feed</span>
+                                        <span class="timeline-badge"><i class="fa-solid fa-satellite-dish"></i> Live
+                                            Tracking Feed</span>
                                         <h5 class="fw-bold mt-3 mb-1 text-white">Shipment Lifecycle</h5>
-                                        <p class="small text-muted mb-0">Latest event first. Every milestone shows a timestamp, status, and location.</p>
+                                        <p class="small text-muted mb-0">Latest event first. Every milestone shows a
+                                            timestamp, status, and location.</p>
                                     </div>
                                     <div class="text-lg-end">
                                         <small class="text-uppercase text-muted d-block">Current Status</small>
-                                        <span class="badge bg-light text-dark mt-1" id="modalCurrentStatus">Pending</span>
+                                        <span class="badge bg-light text-dark mt-1"
+                                            id="modalCurrentStatus">Pending</span>
                                     </div>
                                 </div>
 
                                 <div class="timeline-meta-card mb-4">
                                     <div class="row g-3">
                                         <div class="col-sm-6">
-                                            <small class="text-uppercase text-muted fw-bold d-block mb-1">Shipment Ref</small>
+                                            <small class="text-uppercase text-muted fw-bold d-block mb-1">Shipment
+                                                Ref</small>
                                             <div class="fw-semibold text-white" id="modalTrackingSummary"></div>
                                         </div>
                                         <div class="col-sm-6">
-                                            <small class="text-uppercase text-muted fw-bold d-block mb-1">Booked Timestamp</small>
-                                            <div class="fw-semibold text-white" id="modalBookedDate">Awaiting update</div>
+                                            <small class="text-uppercase text-muted fw-bold d-block mb-1">Booked
+                                                Timestamp</small>
+                                            <div class="fw-semibold text-white" id="modalBookedDate">Awaiting update
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <ul class="timeline-vertical" id="trackingTimelineList">
                                     <li class="timeline-event">
-                                        <div class="timeline-marker"><i class="fa-solid fa-spinner fa-spin text-info"></i></div>
+                                        <div class="timeline-marker"><i
+                                                class="fa-solid fa-spinner fa-spin text-info"></i></div>
                                         <div class="timeline-panel">
                                             <div class="timeline-status">Loading timeline...</div>
                                         </div>
@@ -654,7 +828,8 @@ include('loading.html');
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
-                    <button class="btn btn-outline-dark btn-sm" onclick="openWaybill()"><i class="bi bi-upc-scan me-1"></i>Generate Waybill</button>
+                    <button class="btn btn-outline-dark btn-sm" onclick="openWaybill()"><i
+                            class="bi bi-upc-scan me-1"></i>Generate Waybill</button>
                     <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -677,7 +852,8 @@ include('loading.html');
                         <option value="Found cheaper option">Found cheaper option</option>
                         <option value="Others">Others</option>
                     </select>
-                    <textarea class="form-control" id="cancelFeedback" rows="3" placeholder="Specify reason..." style="display:none;"></textarea>
+                    <textarea class="form-control" id="cancelFeedback" rows="3" placeholder="Specify reason..."
+                        style="display:none;"></textarea>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
@@ -698,13 +874,19 @@ include('loading.html');
                     <form id="ratingForm">
                         <input type="hidden" id="rateShipmentId" name="shipment_id">
                         <div class="mb-3 display-6">
-                            <input type="radio" name="rating" value="5" id="r5"><label for="r5" class="mx-1" style="cursor:pointer">5★</label>
-                            <input type="radio" name="rating" value="4" id="r4"><label for="r4" class="mx-1" style="cursor:pointer">4★</label>
-                            <input type="radio" name="rating" value="3" id="r3"><label for="r3" class="mx-1" style="cursor:pointer">3★</label>
-                            <input type="radio" name="rating" value="2" id="r2"><label for="r2" class="mx-1" style="cursor:pointer">2★</label>
-                            <input type="radio" name="rating" value="1" id="r1"><label for="r1" class="mx-1" style="cursor:pointer">1★</label>
+                            <input type="radio" name="rating" value="5" id="r5"><label for="r5" class="mx-1"
+                                style="cursor:pointer">5★</label>
+                            <input type="radio" name="rating" value="4" id="r4"><label for="r4" class="mx-1"
+                                style="cursor:pointer">4★</label>
+                            <input type="radio" name="rating" value="3" id="r3"><label for="r3" class="mx-1"
+                                style="cursor:pointer">3★</label>
+                            <input type="radio" name="rating" value="2" id="r2"><label for="r2" class="mx-1"
+                                style="cursor:pointer">2★</label>
+                            <input type="radio" name="rating" value="1" id="r1"><label for="r1" class="mx-1"
+                                style="cursor:pointer">1★</label>
                         </div>
-                        <textarea class="form-control" name="feedback" placeholder="How was your experience?" rows="3"></textarea>
+                        <textarea class="form-control" name="feedback" placeholder="How was your experience?"
+                            rows="3"></textarea>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -834,93 +1016,93 @@ include('loading.html');
                 method: 'POST',
                 body: fd
             })
-            .then(r => r.json())
-            .then(res => {
-                if (!res.success) {
-                    alert(res.message);
-                    return;
-                }
-
-                const d = res.data;
-                currentShipmentData = d;
-                const trackingNo = res.tracking_no || ("TRK" + String(id).padStart(6, '0'));
-                const currentStatus = statusPresentation(d.status);
-
-                document.getElementById('modalTrackingNo').innerText = trackingNo;
-                document.getElementById('modalTrackingSummary').textContent = trackingNo;
-                document.getElementById('modalBookedDate').textContent = d.created_at ? new Date(d.created_at).toLocaleString() : 'Awaiting update';
-                document.getElementById('modalCurrentStatus').className = `badge ${currentStatus.badge} mt-1`;
-                document.getElementById('modalCurrentStatus').textContent = currentStatus.label;
-
-                JsBarcode("#barcode", trackingNo, {
-                    format: "CODE128",
-                    lineColor: "#0f172a",
-                    width: 2,
-                    height: 40,
-                    displayValue: false
-                });
-
-                document.getElementById('modalSender').textContent = d.sender_name || 'Unknown sender';
-                document.getElementById('modalReceiver').textContent = d.receiver_name || 'Unknown receiver';
-
-                const sContact = d.sender_contact || "No Contact";
-                const sLink = document.getElementById('modalSenderContactLink');
-                sLink.textContent = sContact;
-                sLink.href = sContact !== "No Contact" ? "tel:" + sContact : "#";
-
-                const rContact = d.receiver_contact || "No Contact";
-                const rLink = document.getElementById('modalReceiverContactLink');
-                rLink.textContent = rContact;
-                rLink.href = rContact !== "No Contact" ? "tel:" + rContact : "#";
-
-                document.getElementById('modalOrigin').textContent = d.origin_address || 'Origin not available';
-                document.getElementById('modalDestination').textContent = d.destination_address || 'Destination not available';
-                document.getElementById('modalSpecificAddress').textContent = d.specific_address || d.address || 'No additional notes.';
-
-                document.getElementById('modalPkgType').textContent = (d.package_type || 'Package').toUpperCase();
-                document.getElementById('modalWeight').textContent = d.weight || '0';
-                document.getElementById('modalPkgDesc').textContent = d.package_description || d.package || '-';
-                document.getElementById('modalPaymentMethod').textContent = (d.payment_method || 'N/A').toUpperCase();
-                document.getElementById('modalPrice').textContent = "PHP " + parseFloat(d.price || 0).toLocaleString('en-US', {
-                    minimumFractionDigits: 2
-                });
-
-                renderTimeline(res.timeline || []);
-
-                const normalized = (d.status || '').toString().toLowerCase().replace(/[\s-]+/g, '_');
-                let btns = '';
-                if (normalized === 'pending' || normalized === 'booked') {
-                    btns += `<button onclick="openCancelModal(${d.id})" class="btn btn-outline-danger w-100">Cancel Shipment</button>`;
-                } else if (['ready_to_dispatch', 'consolidated', 'in_transit', 'arrived', 'out_for_delivery'].includes(normalized)) {
-                    btns += `<button onclick="updateStatus(${d.id}, 'Delivered')" class="btn btn-success w-100">Mark as Received</button>`;
-                } else if (normalized === 'delivered' && (!d.rating || d.rating == 0)) {
-                    btns += `<button onclick="openRateModal(${d.id})" class="btn btn-warning w-100 fw-bold">Rate Service</button>`;
-                }
-                btns += `<button onclick="openWaybill()" class="btn btn-dark w-100 mt-2">Generate Waybill</button>`;
-                document.getElementById('actionButtonsContainer').innerHTML = btns;
-
-                const section = document.getElementById('ratingDisplaySection');
-                const title = document.getElementById('feedbackTitle');
-                const stars = document.getElementById('modalStars');
-                const text = document.getElementById('modalFeedbackText');
-
-                if (normalized === 'cancelled') {
-                    section.style.display = 'block';
-                    title.innerHTML = '<span class="text-danger">Cancellation Reason</span>';
-                    stars.innerHTML = '';
-                    text.textContent = d.cancel_reason || d.feedback_text || 'No reason provided.';
-                } else if (d.rating > 0) {
-                    section.style.display = 'block';
-                    title.innerHTML = '<span class="text-warning">Your Rating</span>';
-                    let starMarkup = '';
-                    for (let i = 1; i <= 5; i++) {
-                        starMarkup += i <= d.rating ? '&#9733;' : '&#9734;';
+                .then(r => r.json())
+                .then(res => {
+                    if (!res.success) {
+                        alert(res.message);
+                        return;
                     }
-                    stars.innerHTML = starMarkup;
-                    text.textContent = d.feedback_text || 'No comments.';
-                }
-            })
-            .catch(err => console.error(err));
+
+                    const d = res.data;
+                    currentShipmentData = d;
+                    const trackingNo = res.tracking_no || ("TRK" + String(id).padStart(6, '0'));
+                    const currentStatus = statusPresentation(d.status);
+
+                    document.getElementById('modalTrackingNo').innerText = trackingNo;
+                    document.getElementById('modalTrackingSummary').textContent = trackingNo;
+                    document.getElementById('modalBookedDate').textContent = d.created_at ? new Date(d.created_at).toLocaleString() : 'Awaiting update';
+                    document.getElementById('modalCurrentStatus').className = `badge ${currentStatus.badge} mt-1`;
+                    document.getElementById('modalCurrentStatus').textContent = currentStatus.label;
+
+                    JsBarcode("#barcode", trackingNo, {
+                        format: "CODE128",
+                        lineColor: "#0f172a",
+                        width: 2,
+                        height: 40,
+                        displayValue: false
+                    });
+
+                    document.getElementById('modalSender').textContent = d.sender_name || 'Unknown sender';
+                    document.getElementById('modalReceiver').textContent = d.receiver_name || 'Unknown receiver';
+
+                    const sContact = d.sender_contact || "No Contact";
+                    const sLink = document.getElementById('modalSenderContactLink');
+                    sLink.textContent = sContact;
+                    sLink.href = sContact !== "No Contact" ? "tel:" + sContact : "#";
+
+                    const rContact = d.receiver_contact || "No Contact";
+                    const rLink = document.getElementById('modalReceiverContactLink');
+                    rLink.textContent = rContact;
+                    rLink.href = rContact !== "No Contact" ? "tel:" + rContact : "#";
+
+                    document.getElementById('modalOrigin').textContent = d.origin_address || 'Origin not available';
+                    document.getElementById('modalDestination').textContent = d.destination_address || 'Destination not available';
+                    document.getElementById('modalSpecificAddress').textContent = d.specific_address || d.address || 'No additional notes.';
+
+                    document.getElementById('modalPkgType').textContent = (d.package_type || 'Package').toUpperCase();
+                    document.getElementById('modalWeight').textContent = d.weight || '0';
+                    document.getElementById('modalPkgDesc').textContent = d.package_description || d.package || '-';
+                    document.getElementById('modalPaymentMethod').textContent = (d.payment_method || 'N/A').toUpperCase();
+                    document.getElementById('modalPrice').textContent = "PHP " + parseFloat(d.price || 0).toLocaleString('en-US', {
+                        minimumFractionDigits: 2
+                    });
+
+                    renderTimeline(res.timeline || []);
+
+                    const normalized = (d.status || '').toString().toLowerCase().replace(/[\s-]+/g, '_');
+                    let btns = '';
+                    if (normalized === 'pending' || normalized === 'booked') {
+                        btns += `<button onclick="openCancelModal(${d.id})" class="btn btn-outline-danger w-100">Cancel Shipment</button>`;
+                    } else if (['ready_to_dispatch', 'consolidated', 'in_transit', 'arrived', 'out_for_delivery'].includes(normalized)) {
+                        btns += `<button onclick="updateStatus(${d.id}, 'Delivered')" class="btn btn-success w-100">Mark as Received</button>`;
+                    } else if (normalized === 'delivered' && (!d.rating || d.rating == 0)) {
+                        btns += `<button onclick="openRateModal(${d.id})" class="btn btn-warning w-100 fw-bold">Rate Service</button>`;
+                    }
+                    btns += `<button onclick="openWaybill()" class="btn btn-dark w-100 mt-2">Generate Waybill</button>`;
+                    document.getElementById('actionButtonsContainer').innerHTML = btns;
+
+                    const section = document.getElementById('ratingDisplaySection');
+                    const title = document.getElementById('feedbackTitle');
+                    const stars = document.getElementById('modalStars');
+                    const text = document.getElementById('modalFeedbackText');
+
+                    if (normalized === 'cancelled') {
+                        section.style.display = 'block';
+                        title.innerHTML = '<span class="text-danger">Cancellation Reason</span>';
+                        stars.innerHTML = '';
+                        text.textContent = d.cancel_reason || d.feedback_text || 'No reason provided.';
+                    } else if (d.rating > 0) {
+                        section.style.display = 'block';
+                        title.innerHTML = '<span class="text-warning">Your Rating</span>';
+                        let starMarkup = '';
+                        for (let i = 1; i <= 5; i++) {
+                            starMarkup += i <= d.rating ? '&#9733;' : '&#9734;';
+                        }
+                        stars.innerHTML = starMarkup;
+                        text.textContent = d.feedback_text || 'No comments.';
+                    }
+                })
+                .catch(err => console.error(err));
         }
 
         function openCancelModal(id) {
@@ -984,31 +1166,31 @@ include('loading.html');
         }
     </script>
     <script>
-    // AUTO-CHECK NOTIFICATIONS EVERY 5 SECONDS
-    function fetchNotifications() {
-        fetch('api/get_notifications.php')
-        .then(response => response.json())
-        .then(data => {
-            const badge = document.getElementById('notifBadge');
-            const list = document.getElementById('notifList');
+        // AUTO-CHECK NOTIFICATIONS EVERY 5 SECONDS
+        function fetchNotifications() {
+            fetch('api/get_notifications.php')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notifBadge');
+                    const list = document.getElementById('notifList');
 
-            // 1. Update Badge Count
-            if (data.count > 0) {
-                badge.innerText = data.count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
+                    // 1. Update Badge Count
+                    if (data.count > 0) {
+                        badge.innerText = data.count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
 
-            // 2. Update Dropdown List
-            let html = '';
-            if (data.data.length > 0) {
-                data.data.forEach(notif => {
-                    // Check if read or unread styling
-                    let bgClass = notif.is_read == 0 ? 'bg-light' : '';
-                    let icon = notif.is_read == 0 ? 'bi-circle-fill text-primary' : 'bi-check-circle text-muted';
-                    
-                    html += `
+                    // 2. Update Dropdown List
+                    let html = '';
+                    if (data.data.length > 0) {
+                        data.data.forEach(notif => {
+                            // Check if read or unread styling
+                            let bgClass = notif.is_read == 0 ? 'bg-light' : '';
+                            let icon = notif.is_read == 0 ? 'bi-circle-fill text-primary' : 'bi-check-circle text-muted';
+
+                            html += `
                     <li>
                         <a class="dropdown-item ${bgClass} p-2 border-bottom" href="${notif.link}">
                             <div class="d-flex align-items-start">
@@ -1022,29 +1204,29 @@ include('loading.html');
                             </div>
                         </a>
                     </li>`;
+                        });
+                    } else {
+                        html = '<li class="text-center p-3 text-muted small">No notifications</li>';
+                    }
+                    list.innerHTML = html;
                 });
-            } else {
-                html = '<li class="text-center p-3 text-muted small">No notifications</li>';
-            }
-            list.innerHTML = html;
-        });
-    }
+        }
 
-    // Mark as Read when clicked
-    function markRead() {
-        fetch('api/get_notifications.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=read_all'
-        }).then(() => {
-            document.getElementById('notifBadge').style.display = 'none';
-        });
-    }
+        // Mark as Read when clicked
+        function markRead() {
+            fetch('api/get_notifications.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=read_all'
+            }).then(() => {
+                document.getElementById('notifBadge').style.display = 'none';
+            });
+        }
 
-    // Initial Call + Interval
-    fetchNotifications();
-    setInterval(fetchNotifications, 5000); // Check every 5 seconds
-</script>
+        // Initial Call + Interval
+        fetchNotifications();
+        setInterval(fetchNotifications, 5000); // Check every 5 seconds
+    </script>
 </body>
 
 </html>

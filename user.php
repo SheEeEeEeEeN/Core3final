@@ -355,7 +355,7 @@ $statusDistributionValues = array_values($statusDistribution);
             --sidebar-width: 260px;
             --primary-color: #222831;
             --primary-hover: #393E46;
-            --secondary-color: #DFD0B8;
+            --secondary-color: #dddad6ff;
             --text-main: #222831;
             --text-secondary: #393E46;
             --border-color: #948979;
@@ -979,7 +979,8 @@ $statusDistributionValues = array_values($statusDistribution);
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="small text-secondary mb-3">Revenue trend based on booked shipments, excluding cancelled loads.</p>
+                                <p class="small text-secondary mb-3">Revenue trend based on booked shipments, excluding
+                                    cancelled loads.</p>
                                 <div style="height:240px;"><canvas id="dailyRevenueChart"></canvas></div>
                             </div>
                         </div>
@@ -996,7 +997,8 @@ $statusDistributionValues = array_values($statusDistribution);
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="small text-secondary mb-3">Current distribution across consolidated, cancelled, delivered, and archived shipments.</p>
+                                <p class="small text-secondary mb-3">Current distribution across consolidated,
+                                    cancelled, delivered, and archived shipments.</p>
                                 <div style="height:240px;"><canvas id="statusDistributionChart"></canvas></div>
                             </div>
                         </div>
@@ -1037,8 +1039,10 @@ $statusDistributionValues = array_values($statusDistribution);
 
             <div class="col-lg-4">
                 <?php if ($topAction): ?>
-                    <div class="action-alert action-alert-<?php echo $topAction['variant'] === 'warning' ? 'warning' : 'danger'; ?> shadow-sm mb-4 d-flex align-items-start gap-3 p-3">
-                        <i class="<?php echo $topAction['icon']; ?> fs-4 mt-1 <?php echo $topAction['variant'] === 'warning' ? 'text-warning' : 'text-danger'; ?>"></i>
+                    <div
+                        class="action-alert action-alert-<?php echo $topAction['variant'] === 'warning' ? 'warning' : 'danger'; ?> shadow-sm mb-4 d-flex align-items-start gap-3 p-3">
+                        <i
+                            class="<?php echo $topAction['icon']; ?> fs-4 mt-1 <?php echo $topAction['variant'] === 'warning' ? 'text-warning' : 'text-danger'; ?>"></i>
                         <div>
                             <h6 class="fw-bold mb-1">Action Required</h6>
                             <small class="d-block"><?php echo htmlspecialchars($topAction['title']); ?></small>
@@ -1058,14 +1062,18 @@ $statusDistributionValues = array_values($statusDistribution);
                         <?php if ($actionCount > 0): ?>
                             <div class="d-grid gap-3">
                                 <?php foreach ($actionItems as $item): ?>
-                                    <div class="action-alert action-alert-<?php echo $item['variant'] === 'warning' ? 'warning' : 'danger'; ?> p-3">
+                                    <div
+                                        class="action-alert action-alert-<?php echo $item['variant'] === 'warning' ? 'warning' : 'danger'; ?> p-3">
                                         <div class="d-flex align-items-start gap-3">
-                                            <div class="<?php echo $item['variant'] === 'warning' ? 'text-warning' : 'text-danger'; ?>">
+                                            <div
+                                                class="<?php echo $item['variant'] === 'warning' ? 'text-warning' : 'text-danger'; ?>">
                                                 <i class="<?php echo $item['icon']; ?> fs-5"></i>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <div class="fw-semibold mb-1"><?php echo htmlspecialchars($item['title']); ?></div>
-                                                <div class="small text-muted"><?php echo htmlspecialchars($item['detail']); ?></div>
+                                                <div class="fw-semibold mb-1"><?php echo htmlspecialchars($item['title']); ?>
+                                                </div>
+                                                <div class="small text-muted"><?php echo htmlspecialchars($item['detail']); ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1073,7 +1081,8 @@ $statusDistributionValues = array_values($statusDistribution);
                             </div>
                         <?php else: ?>
                             <div class="text-center py-4 text-muted small"><i
-                                    class="bi bi-check-circle fs-3 d-block mb-1 text-success"></i>No action items right now.</div>
+                                    class="bi bi-check-circle fs-3 d-block mb-1 text-success"></i>No action items right now.
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

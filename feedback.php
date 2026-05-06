@@ -16,11 +16,13 @@ if (isset($_POST['Send_feedback'])) {
     if (!empty($comment)) {
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
             $target_dir = "uploads/";
-            if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
             $file_ext = strtolower(pathinfo($_FILES["attachment"]["name"], PATHINFO_EXTENSION));
             $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
             if (in_array($file_ext, $allowed_types)) {
-                $new_filename = "ticket_" . time() . "_" . rand(100,999) . "." . $file_ext;
+                $new_filename = "ticket_" . time() . "_" . rand(100, 999) . "." . $file_ext;
                 $target_file = $target_dir . $new_filename;
                 if (move_uploaded_file($_FILES["attachment"]["tmp_name"], $target_file)) {
                     $attachment = $new_filename;
@@ -29,7 +31,7 @@ if (isset($_POST['Send_feedback'])) {
         }
         $stmt = $conn->prepare("INSERT INTO feedback (account_id, comment, attachment, created_at) VALUES (?, ?, ?, NOW())");
         $stmt->bind_param("iss", $account_id, $comment, $attachment);
-        
+
         if ($stmt->execute()) {
             $success = "Ticket submitted successfully!";
             // NOTIFY ADMINS
@@ -45,9 +47,13 @@ if (isset($_POST['Send_feedback'])) {
                 }
                 $notifStmt->close();
             }
-        } else { $error = "Database error: " . $conn->error; }
+        } else {
+            $error = "Database error: " . $conn->error;
+        }
         $stmt->close();
-    } else { $error = "Please enter description."; }
+    } else {
+        $error = "Please enter description.";
+    }
 }
 
 // Fetch Tickets
@@ -79,6 +85,7 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,7 +93,7 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+
     <style>
         :root {
             --bs-primary: #222831;
@@ -94,7 +101,7 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
             --sidebar-width: 260px;
             --primary-color: #222831;
             --primary-hover: #393E46;
-            --secondary-color: #DFD0B8;
+            --secondary-color: #dddad6ff;
             --text-main: #222831;
             --text-secondary: #393E46;
             --border-color: #948979;
@@ -111,61 +118,255 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
             --radius-lg: 12px;
         }
 
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--secondary-color); color: var(--text-main); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-
-        /* SIDEBAR */
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: #ffffff; color: var(--text-main); z-index: 1040; transition: all 0.3s ease; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .content { margin-left: var(--sidebar-width); padding: 24px; transition: all 0.3s ease; min-height: 100vh; }
-        .sidebar.collapsed { margin-left: calc(var(--sidebar-width) * -1); }
-        .content.expanded { margin-left: 0; }
-
-        @media (max-width: 768px) {
-            .sidebar { margin-left: calc(var(--sidebar-width) * -1); }
-            .sidebar.show { margin-left: 0; }
-            .content { margin-left: 0; padding: 15px; }
-            .content.expanded { margin-left: 0; }
-            .content.mobile-expanded { margin-left: var(--sidebar-width); }
+        * {
+            box-sizing: border-box;
         }
 
-        .nav-link { font-weight: 500; color: var(--text-secondary) !important; transition: all 0.2s ease; margin-bottom: 4px; border-radius: var(--radius-md); padding: 10px 16px; display: flex; align-items: center; white-space: nowrap; }
-        .nav-link:hover { color: var(--text-main) !important; background: var(--secondary-color); }
-        .nav-link.active { color: #ffffff !important; background: var(--primary-color); font-weight: 600; }
-        .nav-link i { font-size: 1.1rem; margin-right: 12px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        body:not(.dark-mode) .sidebar img[alt="Logo"] { filter: brightness(0); }
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #ffffff;
+            color: var(--text-main);
+            z-index: 1040;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .sidebar.collapsed {
+            margin-left: calc(var(--sidebar-width) * -1);
+        }
+
+        .content.expanded {
+            margin-left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: calc(var(--sidebar-width) * -1);
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .content.expanded {
+                margin-left: 0;
+            }
+
+            .content.mobile-expanded {
+                margin-left: var(--sidebar-width);
+            }
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-secondary) !important;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--text-main) !important;
+            background: var(--secondary-color);
+        }
+
+        .nav-link.active {
+            color: #ffffff !important;
+            background: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+            margin-right: 12px;
+        }
+
+        body:not(.dark-mode) .sidebar img[alt="Logo"] {
+            filter: brightness(0);
+        }
 
         /* Components */
-        .card { border: none; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
-        
+        .card {
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+
         /* Feedback Specific */
-        .feedback-textarea { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; resize: none; color: var(--text-main); }
-        .ticket-item { background: #ffffff; margin-bottom: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); border-left: 4px solid var(--primary-color); }
-        .ticket-header { padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fafafa; border-radius: var(--radius-md) var(--radius-md) 0 0; }
-        .ticket-body { padding: 1.2rem; }
-        .admin-reply-box { background-color: var(--secondary-color); border-radius: var(--radius-md); padding: 1rem; margin-top: 1rem; border: 1px solid var(--border-color); }
-        .badge-ticket { background: var(--secondary-color); color: var(--primary-color); padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-        .attachment-preview { max-width: 100px; height: auto; border-radius: 5px; cursor: pointer; border: 1px solid var(--border-color); margin-top: 10px; }
+        .feedback-textarea {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            resize: none;
+            color: var(--text-main);
+        }
+
+        .ticket-item {
+            background: #ffffff;
+            margin-bottom: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .ticket-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+
+        .ticket-body {
+            padding: 1.2rem;
+        }
+
+        .admin-reply-box {
+            background-color: var(--secondary-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .badge-ticket {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .attachment-preview {
+            max-width: 100px;
+            height: auto;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
 
         /* Dark Mode Overrides */
-        body.dark-mode { background-color: var(--dark-bg); color: var(--dark-text-main); --bs-card-bg: var(--dark-card); --bs-body-bg: var(--dark-bg); --bs-border-color: var(--dark-border); --bs-body-color: var(--dark-text-main); }
-        body.dark-mode .sidebar { background: var(--dark-card); border-right: 1px solid var(--dark-border); color: var(--dark-text-main); }
-        body.dark-mode .top-header { background-color: var(--dark-card) !important; color: var(--dark-text-main) !important; border: 1px solid var(--dark-border); }
-        body.dark-mode .card,
-        body.dark-mode .ticket-item { background-color: var(--dark-card) !important; color: var(--dark-text-main) !important; border: 1px solid var(--dark-border) !important; }
-        body.dark-mode .text-muted { color: var(--dark-text-sec) !important; }
-        body.dark-mode .modal-content { background-color: var(--dark-card); color: var(--dark-text-main); border: 1px solid var(--dark-border); }
-        body.dark-mode .btn-close { filter: invert(1); }
-        
-        body.dark-mode .feedback-textarea { background-color: var(--dark-bg); border-color: var(--dark-border); color: var(--dark-text-main); }
-        body.dark-mode .admin-reply-box { background-color: var(--dark-bg); border-color: var(--dark-border); }
-        body.dark-mode .bg-light { background-color: var(--dark-bg) !important; color: white; border-color: var(--dark-border) !important; }
-        body.dark-mode .ticket-header { background-color: var(--dark-bg); border-color: var(--dark-border); }
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text-main);
+            --bs-card-bg: var(--dark-card);
+            --bs-body-bg: var(--dark-bg);
+            --bs-border-color: var(--dark-border);
+            --bs-body-color: var(--dark-text-main);
+        }
 
-        body.dark-mode .nav-link { color: var(--dark-text-sec) !important; }
-        body.dark-mode .nav-link:hover { color: var(--dark-text-main) !important; background: var(--dark-border); }
-        body.dark-mode .nav-link.active { color: var(--dark-bg) !important; background: var(--border-color); }
-        body.dark-mode .form-control, body.dark-mode .form-select { background-color: var(--dark-bg); color: white; border-color: var(--dark-border); }
+        body.dark-mode .sidebar {
+            background: var(--dark-card);
+            border-right: 1px solid var(--dark-border);
+            color: var(--dark-text-main);
+        }
+
+        body.dark-mode .top-header {
+            background-color: var(--dark-card) !important;
+            color: var(--dark-text-main) !important;
+            border: 1px solid var(--dark-border);
+        }
+
+        body.dark-mode .card,
+        body.dark-mode .ticket-item {
+            background-color: var(--dark-card) !important;
+            color: var(--dark-text-main) !important;
+            border: 1px solid var(--dark-border) !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: var(--dark-text-sec) !important;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: var(--dark-card);
+            color: var(--dark-text-main);
+            border: 1px solid var(--dark-border);
+        }
+
+        body.dark-mode .btn-close {
+            filter: invert(1);
+        }
+
+        body.dark-mode .feedback-textarea {
+            background-color: var(--dark-bg);
+            border-color: var(--dark-border);
+            color: var(--dark-text-main);
+        }
+
+        body.dark-mode .admin-reply-box {
+            background-color: var(--dark-bg);
+            border-color: var(--dark-border);
+        }
+
+        body.dark-mode .bg-light {
+            background-color: var(--dark-bg) !important;
+            color: white;
+            border-color: var(--dark-border) !important;
+        }
+
+        body.dark-mode .ticket-header {
+            background-color: var(--dark-bg);
+            border-color: var(--dark-border);
+        }
+
+        body.dark-mode .nav-link {
+            color: var(--dark-text-sec) !important;
+        }
+
+        body.dark-mode .nav-link:hover {
+            color: var(--dark-text-main) !important;
+            background: var(--dark-border);
+        }
+
+        body.dark-mode .nav-link.active {
+            color: var(--dark-bg) !important;
+            background: var(--border-color);
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: var(--dark-bg);
+            color: white;
+            border-color: var(--dark-border);
+        }
     </style>
 </head>
 
@@ -179,28 +380,33 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
         <hr class="border-secondary opacity-25">
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="user.php" class="nav-link"><i class="bi bi-grid-1x2"></i> <span class="sidebar-text">Dashboard</span></a>
+                <a href="user.php" class="nav-link"><i class="bi bi-grid-1x2"></i> <span
+                        class="sidebar-text">Dashboard</span></a>
             </li>
             <li class="nav-item">
-                <a href="bookshipment.php" class="nav-link"><i class="bi bi-box-seam"></i> <span class="sidebar-text">Book Shipment</span></a>
+                <a href="bookshipment.php" class="nav-link"><i class="bi bi-box-seam"></i> <span
+                        class="sidebar-text">Book Shipment</span></a>
             </li>
             <li class="nav-item">
-                <a href="My_shipment.php" class="nav-link"><i class="bi bi-truck"></i> <span class="sidebar-text">My Shipments</span></a>
+                <a href="My_shipment.php" class="nav-link"><i class="bi bi-truck"></i> <span class="sidebar-text">My
+                        Shipments</span></a>
             </li>
             <li class="nav-item">
-                <a href="shiphistory.php" class="nav-link"><i class="bi bi-clock-history"></i> <span class="sidebar-text">History</span></a>
+                <a href="shiphistory.php" class="nav-link"><i class="bi bi-clock-history"></i> <span
+                        class="sidebar-text">History</span></a>
             </li>
             <li class="nav-item">
-                <a href="feedback.php" class="nav-link active"><i class="bi bi-chat-square-text"></i> <span class="sidebar-text">Feedback</span></a>
+                <a href="feedback.php" class="nav-link active"><i class="bi bi-chat-square-text"></i> <span
+                        class="sidebar-text">Feedback</span></a>
             </li>
         </ul>
     </div>
 
     <div class="content" id="mainContent">
-        <header class="top-header d-flex align-items-center justify-content-between sticky-top mb-4 p-3 bg-white shadow-sm rounded-3">
+        <header
+            class="top-header d-flex align-items-center justify-content-between sticky-top mb-4 p-3 bg-white shadow-sm rounded-3">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light border-0 p-2" id="hamburger"><i
-                        class="bi bi-list fs-4"></i></button>
+                <button class="btn btn-light border-0 p-2" id="hamburger"><i class="bi bi-list fs-4"></i></button>
                 <div>
                     <h5 class="fw-bold mb-0">Helpdesk & Feedback</h5>
                 </div>
@@ -241,8 +447,8 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
                 <div class="dropdown">
                     <a href="#" data-bs-toggle="dropdown" class="d-block link-dark text-decoration-none"
                         style="cursor: pointer;">
-                        <img src="<?php echo $profileImage ?? 'default-avatar.png'; ?>" alt="Profile" width="36" height="36"
-                            class="rounded-circle object-fit-cover border border-2 border-primary">
+                        <img src="<?php echo $profileImage ?? 'default-avatar.png'; ?>" alt="Profile" width="36"
+                            height="36" class="rounded-circle object-fit-cover border border-2 border-primary">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end text-small shadow"
                         style="border: 1px solid var(--border-color); border-radius: var(--radius-md);">
@@ -266,17 +472,21 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
                         <h6 class="fw-bold mb-0">Create New Ticket</h6>
                     </div>
                     <div class="card-body">
-                        <?php if (isset($success)) echo "<div class='alert alert-success py-2 small'><i class='bi bi-check-circle me-1'></i> $success</div>"; ?>
-                        <?php if (isset($error)) echo "<div class='alert alert-danger py-2 small'><i class='bi bi-exclamation-circle me-1'></i> $error</div>"; ?>
-                        
+                        <?php if (isset($success))
+                            echo "<div class='alert alert-success py-2 small'><i class='bi bi-check-circle me-1'></i> $success</div>"; ?>
+                        <?php if (isset($error))
+                            echo "<div class='alert alert-danger py-2 small'><i class='bi bi-exclamation-circle me-1'></i> $error</div>"; ?>
+
                         <form method="POST" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-muted">Describe your concern</label>
-                                <textarea class="form-control feedback-textarea" name="comment" rows="5" placeholder="Details..." required></textarea>
+                                <textarea class="form-control feedback-textarea" name="comment" rows="5"
+                                    placeholder="Details..." required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-muted">Attach Proof (Optional)</label>
-                                <input type="file" name="attachment" class="form-control form-control-sm" accept="image/*">
+                                <input type="file" name="attachment" class="form-control form-control-sm"
+                                    accept="image/*">
                                 <small class="text-muted" style="font-size: 0.7rem;">Max 2MB (JPG, PNG)</small>
                             </div>
                             <button type="submit" name="Send_feedback" class="btn btn-primary w-100 py-2 fw-bold">
@@ -299,7 +509,8 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
                             <div class="ticket-header">
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge-ticket">TICKET #<?= $fb['id'] ?></span>
-                                    <span class="small text-muted"><i class="bi bi-clock me-1"></i> <?= date("M d, Y h:i A", strtotime($fb['created_at'])) ?></span>
+                                    <span class="small text-muted"><i class="bi bi-clock me-1"></i>
+                                        <?= date("M d, Y h:i A", strtotime($fb['created_at'])) ?></span>
                                 </div>
                                 <div class="small fw-bold">
                                     <?php echo !empty($fb['replies']) ? '<span class="text-success"><i class="bi bi-check-all"></i> Replied</span>' : '<span class="text-warning"><i class="bi bi-hourglass-split"></i> Pending</span>'; ?>
@@ -307,12 +518,16 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
                             </div>
                             <div class="ticket-body">
                                 <div class="d-flex gap-3">
-                                    <div class="flex-shrink-0"><img src="<?php echo $profileImage; ?>" class="rounded-circle" width="35" height="35" alt="User"></div>
+                                    <div class="flex-shrink-0"><img src="<?php echo $profileImage; ?>" class="rounded-circle"
+                                            width="35" height="35" alt="User"></div>
                                     <div>
                                         <h6 class="fw-bold mb-1">You</h6>
                                         <p class="mb-0 text-break"><?= nl2br(htmlspecialchars($fb['comment'])) ?></p>
-                                        <?php if(!empty($fb['attachment'])): ?>
-                                            <div class="mt-2"><small class="text-muted d-block"><i class="bi bi-paperclip"></i> Attachment:</small><img src="uploads/<?= $fb['attachment'] ?>" class="attachment-preview" onclick="viewImage('uploads/<?= $fb['attachment'] ?>')" alt="Attachment"></div>
+                                        <?php if (!empty($fb['attachment'])): ?>
+                                            <div class="mt-2"><small class="text-muted d-block"><i class="bi bi-paperclip"></i>
+                                                    Attachment:</small><img src="uploads/<?= $fb['attachment'] ?>"
+                                                    class="attachment-preview"
+                                                    onclick="viewImage('uploads/<?= $fb['attachment'] ?>')" alt="Attachment"></div>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -320,10 +535,18 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
                                     <?php foreach ($fb['replies'] as $r): ?>
                                         <div class="admin-reply-box ms-md-5">
                                             <div class="d-flex gap-3">
-                                                <div class="flex-shrink-0"><div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:35px; height:35px;"><i class="bi bi-headset"></i></div></div>
+                                                <div class="flex-shrink-0">
+                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                        style="width:35px; height:35px;"><i class="bi bi-headset"></i></div>
+                                                </div>
                                                 <div class="w-100">
-                                                    <div class="d-flex justify-content-between mb-1"><span class="fw-bold text-primary">Support Team (<?= htmlspecialchars($r['admin_name']) ?>)</span><small class="text-muted"><?= date("M d, h:i A", strtotime($r['created_at'])) ?></small></div>
-                                                    <p class="mb-0 small text-break"><?= nl2br(htmlspecialchars($r['reply_message'])) ?></p>
+                                                    <div class="d-flex justify-content-between mb-1"><span
+                                                            class="fw-bold text-primary">Support Team
+                                                            (<?= htmlspecialchars($r['admin_name']) ?>)</span><small
+                                                            class="text-muted"><?= date("M d, h:i A", strtotime($r['created_at'])) ?></small>
+                                                    </div>
+                                                    <p class="mb-0 small text-break"><?= nl2br(htmlspecialchars($r['reply_message'])) ?>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -333,7 +556,9 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="text-center py-5 text-muted card"><h6>No support tickets found</h6></div>
+                    <div class="text-center py-5 text-muted card">
+                        <h6>No support tickets found</h6>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -343,7 +568,8 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body text-center position-relative">
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 bg-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 bg-white"
+                        data-bs-dismiss="modal"></button>
                     <img src="" id="modalImage" class="img-fluid rounded shadow-lg" style="max-height: 90vh;">
                 </div>
             </div>
@@ -353,12 +579,12 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         if (typeof initDarkMode === 'function') initDarkMode("userThemeToggle", "userDarkMode");
-        
+
         // SIDEBAR TOGGLE LOGIC
         document.getElementById('hamburger').addEventListener('click', () => {
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('mainContent');
-            
+
             if (window.innerWidth > 768) {
                 // Desktop: Toggle collapsed class
                 sidebar.classList.toggle('collapsed');
@@ -377,29 +603,30 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : 'user.
         // --- NOTIFICATION SCRIPT ---
         function fetchNotifications() {
             fetch('api/get_notifications.php')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('notifBadge');
-                const list = document.getElementById('notifList');
-                if (data.count > 0) { badge.innerText = data.count; badge.style.display = 'inline-block'; } 
-                else { badge.style.display = 'none'; }
-                let html = '';
-                if (data.data.length > 0) {
-                    data.data.forEach(notif => {
-                        let bgClass = notif.is_read == 0 ? 'bg-light' : '';
-                        let icon = notif.is_read == 0 ? 'bi-circle-fill text-primary' : 'bi-check-circle text-muted';
-                        html += `<li><a class="dropdown-item ${bgClass} p-2 border-bottom" href="${notif.link}"><div class="d-flex align-items-start"><i class="bi ${icon} me-2 mt-1" style="font-size: 10px;"></i><div><small class="fw-bold d-block">${notif.title}</small><small class="text-muted text-wrap">${notif.message}</small><br><small class="text-secondary" style="font-size: 0.7rem;">${new Date(notif.created_at).toLocaleString()}</small></div></div></a></li>`;
-                    });
-                } else { html = '<li class="text-center p-3 text-muted small">No notifications</li>'; }
-                list.innerHTML = html;
-            });
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notifBadge');
+                    const list = document.getElementById('notifList');
+                    if (data.count > 0) { badge.innerText = data.count; badge.style.display = 'inline-block'; }
+                    else { badge.style.display = 'none'; }
+                    let html = '';
+                    if (data.data.length > 0) {
+                        data.data.forEach(notif => {
+                            let bgClass = notif.is_read == 0 ? 'bg-light' : '';
+                            let icon = notif.is_read == 0 ? 'bi-circle-fill text-primary' : 'bi-check-circle text-muted';
+                            html += `<li><a class="dropdown-item ${bgClass} p-2 border-bottom" href="${notif.link}"><div class="d-flex align-items-start"><i class="bi ${icon} me-2 mt-1" style="font-size: 10px;"></i><div><small class="fw-bold d-block">${notif.title}</small><small class="text-muted text-wrap">${notif.message}</small><br><small class="text-secondary" style="font-size: 0.7rem;">${new Date(notif.created_at).toLocaleString()}</small></div></div></a></li>`;
+                        });
+                    } else { html = '<li class="text-center p-3 text-muted small">No notifications</li>'; }
+                    list.innerHTML = html;
+                });
         }
         function markRead() {
             fetch('api/get_notifications.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=read_all' })
-            .then(() => { document.getElementById('notifBadge').style.display = 'none'; });
+                .then(() => { document.getElementById('notifBadge').style.display = 'none'; });
         }
         fetchNotifications();
         setInterval(fetchNotifications, 5000);
     </script>
 </body>
+
 </html>
