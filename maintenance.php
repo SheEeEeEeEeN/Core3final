@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary-bg: #0f172a;
@@ -243,6 +244,29 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
         }
+
+        .swal2-popup.contact-support-alert {
+            background: rgba(30, 41, 59, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            color: var(--text-main);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .swal2-popup.contact-support-alert .swal2-title {
+            color: var(--text-main);
+        }
+
+        .swal2-popup.contact-support-alert .swal2-html-container {
+            color: var(--text-muted);
+        }
+
+        .swal2-popup.contact-support-alert .swal2-confirm {
+            border-radius: 10px;
+            padding: 0.75rem 1.4rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -281,7 +305,7 @@
         </div>
 
         <div class="action-buttons">
-            <a href="#" class="btn-custom" onclick="alert('message -> Roy Valle'); return false;">
+            <a href="#" class="btn-custom" id="contactSupportBtn">
                 <i class="bi bi-headset"></i> Contact IT Support
             </a>
             <a href="logout.php" class="btn-custom btn-danger-custom">
@@ -294,6 +318,27 @@
         </div>
     </div>
 
+    <script>
+        document.getElementById('contactSupportBtn').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            if (typeof Swal === 'undefined') {
+                alert('Please message Roy Valle for IT support.');
+                return;
+            }
+
+            Swal.fire({
+                icon: 'info',
+                title: 'Contact IT Support',
+                text: 'Please message Roy Valle for assistance.',
+                confirmButtonText: 'Got it',
+                confirmButtonColor: '#3b82f6',
+                customClass: {
+                    popup: 'contact-support-alert'
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
